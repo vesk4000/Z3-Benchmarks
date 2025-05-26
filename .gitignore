@@ -1,0 +1,14 @@
+# Ignore benchmark results and datasets
+datasets/
+results/
+benchmarks/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs and temp files
+*.log
+
+# VS Code workspace settings (optional if you store local settings elsewhere)
+.vscode/

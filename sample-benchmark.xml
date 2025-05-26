@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
+<benchmark tool="z3" displayName="Z3 Benchmark" timelimit="60s" memlimit="4GB">
+
+  <description>Benchmark for Z3 on SMT problems</description>
+
+  <!-- Z3 with SMT2 format -->
+  <rundefinition name="z3-smt2">
+    <option name="-smt2"/>
+  </rundefinition>
+
+  <!-- Z3 with model validation (useful for debugging) -->
+  <rundefinition name="z3-model-validate">
+    <option name="-smt2"/>
+    <option name="model_validate=true"/>
+  </rundefinition>
+
+  <!-- Resource limits -->
+  <requiredfiles/>
+  <resultfiles/>
+  
+  <!-- Task sets - add your SMT datasets here -->
+  <tasks name="QF_LIA">
+    <include>datasets/QF_LIA/*.smt2</include>
+  </tasks>
+  
+  <tasks name="QF_LRA">
+    <include>datasets/QF_LRA/*.smt2</include>
+  </tasks>
+  
+  <tasks name="QF_UFLIA">
+    <include>datasets/QF_UFLIA/*.smt2</include>
+  </tasks>
+
+  <!-- Additional common SMT-LIB logics -->
+  <tasks name="QF_ABV">
+    <include>datasets/QF_ABV/*.smt2</include>
+  </tasks>
+  
+  <tasks name="QF_BV">
+    <include>datasets/QF_BV/*.smt2</include>
+  </tasks>
+
+  <!-- Column configuration for results -->
+  <columns>
+    <column displayTitle="status" title="status"/>
+    <column displayTitle="cpu time" title="cputime"/>
+    <column displayTitle="wall time" title="walltime"/>
+    <column displayTitle="memory" title="memory"/>
+    <column displayTitle="score" title="score"/>
+  </columns>
+
+</benchmark>
