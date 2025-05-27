@@ -71,9 +71,16 @@ RUN mkdir -p /opt/persistent-setup
 
 WORKDIR /workspace
 
+# Create a symlink so that benchmarks running fuse-overlayfs find /workspaces/Benchmarking
+RUN mkdir -p /workspaces && ln -s /workspace /workspaces/Benchmarking
+
 # Copy the init script and make it executable
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
+
+# Keep below steps at the end so minor changes here don’t bust earlier heavy layers
+# Install sudo and fuse-overlayfs separately in a small layer
+RUN apt-get update && apt-get install -y sudo fuse-overlayfs && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (as recommended in the BenchExec guide)
 RUN useradd -ms /bin/bash benchuser \

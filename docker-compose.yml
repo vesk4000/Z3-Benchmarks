@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  bench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: benchexec
+    privileged: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - unmask=/sys/fs/cgroup
+      - unmask=/proc/*
+      - seccomp=unconfined
+    cgroupns: host
+    volumes:
+      - .:/workspace:cached
+      - z3-bench-persistent-setup:/opt/persistent-setup
+      - z3-bench-apt-cache:/var/cache/apt
+      - z3-bench-pip-cache:/home/benchuser/.cache/pip
+volumes:
+  z3-bench-persistent-setup:
+  z3-bench-apt-cache:
+  z3-bench-pip-cache:
