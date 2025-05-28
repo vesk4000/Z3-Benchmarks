@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
+<benchmark tool="z3" displayName="Quick QF_BV Test" timelimit="60s" memlimit="2GB">
+
+  <description>Quick run on a small QF_BV subset</description>
+
+  <!-- Input SMT2 files from selected subdirectories -->
+  <requiredfiles>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170501-Heizmann-UltimateAutomizer/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170531-Hansen-Check/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+  </requiredfiles>
+
+  <logfiles/>
+  <resultfiles/>
+
+  <rundefinition name="z3-smt2">
+    <option name="-smt2"/>
+  </rundefinition>
+
+  <tasks name="QF_BV_subset">
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170501-Heizmann-UltimateAutomizer/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170531-Hansen-Check/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+  </tasks>
+
+</benchmark>

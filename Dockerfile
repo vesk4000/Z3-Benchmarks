@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     jq \
     time \
-    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 # Add the BenchExec PPA and install BenchExec (as recommended in the guide)
@@ -67,13 +66,6 @@ RUN pip3 install --break-system-packages \
 RUN mkdir -p /workspace /workspace/benchmarks /workspace/results /workspace/datasets \
     /workspace/scripts /workspace/configs
 
-# Download and extract QF_BV tar.zst benchmark dataset (placed outside /workspace)
-RUN apt-get update && apt-get install -y zstd wget && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /benchmarks/QF_BV \
-    && wget -O /benchmarks/QF_BV/QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1" \
-    && tar -I zstd -xf /benchmarks/QF_BV/QF_BV.tar.zst -C /benchmarks/QF_BV \
-    && rm /benchmarks/QF_BV/QF_BV.tar.zst
-
 # Create a directory for persistent system modifications
 RUN mkdir -p /opt/persistent-setup
 
@@ -95,6 +87,11 @@ RUN useradd -ms /bin/bash benchuser \
     && usermod -aG sudo benchuser \
     && echo "benchuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN chown -R benchuser:benchuser /workspace /opt/z3-versions /opt/persistent-setup
+
+# Install small utilities and download QF_BV at the end to preserve cache
+RUN apt-get update && apt-get install -y zstd wget && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /benchmarks/QF_BV && wget -O /benchmarks/QF_BV/QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1" \
+    && tar -I zstd -xf /benchmarks/QF_BV/QF_BV.tar.zst -C /benchmarks/QF_BV && rm /benchmarks/QF_BV/QF_BV.tar.zst
 
 # Set init.sh as the entrypoint (important to use array format)
 ENTRYPOINT ["/init.sh"]
