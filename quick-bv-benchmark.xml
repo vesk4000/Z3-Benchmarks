@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
-<benchmark tool="z3" displayName="Quick QF_BV Test" timelimit="60s" memlimit="2GB">
+<benchmark tool="z3" displayName="Quick QF_BV Test" timelimit="15s" memlimit="2GB">
 
   <description>Quick run on a small QF_BV subset</description>
 
@@ -12,6 +12,10 @@
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Wolf-fmbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20190311-bv-term-small-rw-Noetzli/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20190429-UltimateAutomizerSvcomp2019/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2020-Weber/*.smt2</include>
   </requiredfiles>
 
   <logfiles/>
@@ -28,6 +32,10 @@
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
     <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Wolf-fmbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20190311-bv-term-small-rw-Noetzli/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20190429-UltimateAutomizerSvcomp2019/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2020-Weber/*.smt2</include>
   </tasks>
 
 </benchmark>
