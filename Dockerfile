@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     jq \
     time \
+    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 # Add the BenchExec PPA and install BenchExec (as recommended in the guide)
@@ -65,6 +66,13 @@ RUN pip3 install --break-system-packages \
 # Create workspace and benchmark directories
 RUN mkdir -p /workspace /workspace/benchmarks /workspace/results /workspace/datasets \
     /workspace/scripts /workspace/configs
+
+# Download and extract QF_BV tar.zst benchmark dataset (placed outside /workspace)
+RUN apt-get update && apt-get install -y zstd wget && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /benchmarks/QF_BV \
+    && wget -O /benchmarks/QF_BV/QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1" \
+    && tar -I zstd -xf /benchmarks/QF_BV/QF_BV.tar.zst -C /benchmarks/QF_BV \
+    && rm /benchmarks/QF_BV/QF_BV.tar.zst
 
 # Create a directory for persistent system modifications
 RUN mkdir -p /opt/persistent-setup

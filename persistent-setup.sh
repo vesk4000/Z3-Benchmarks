@@ -32,4 +32,7 @@ echo "Running startup commands..."
 # Example: Start a service, set environment variables, etc.
 # export CUSTOM_PATH="/opt/my-tools:$PATH"
 
+# Create empty dataset folders for all logics to avoid None patterns
+mkdir -p datasets/QF_LIA datasets/QF_LRA datasets/QF_UFLIA datasets/QF_ABV datasets/QF_BV
+
 echo "Persistent setup script finished."
