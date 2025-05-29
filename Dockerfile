@@ -88,10 +88,16 @@ RUN useradd -ms /bin/bash benchuser \
     && echo "benchuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN chown -R benchuser:benchuser /workspace /opt/z3-versions /opt/persistent-setup
 
-# Install small utilities and download QF_BV at the end to preserve cache
+# Install small utilities for QF_BV and download the QF_BV dataset
 RUN apt-get update && apt-get install -y zstd wget && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /benchmarks/QF_BV && wget -O /benchmarks/QF_BV/QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1" \
     && tar -I zstd -xf /benchmarks/QF_BV/QF_BV.tar.zst -C /benchmarks/QF_BV && rm /benchmarks/QF_BV/QF_BV.tar.zst
+
+# Install bzip2 and download the VLSAT-3 dataset in its own layer
+RUN apt-get update && apt-get install -y bzip2 wget && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /benchmarks/VLSAT3 \
+    && wget -r --no-parent -A "vlsat3*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P /benchmarks/VLSAT3 \
+    && find /benchmarks/VLSAT3 -name "*.smt2.bz2" -exec bunzip2 {} +
 
 # Set init.sh as the entrypoint (important to use array format)
 ENTRYPOINT ["/init.sh"]

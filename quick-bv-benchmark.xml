@@ -21,6 +21,13 @@
   <logfiles/>
   <resultfiles/>
 
+  <!-- Z3 with int-blast theory solver -->
+  <rundefinition name="z3-int-blast">
+    <option name="-smt2"/>
+    <option name="sat.smt=true"/>
+    <option name="smt.bv.solver=2"/>
+  </rundefinition>
+  <!-- Default Z3 (SMT2 input) -->
   <rundefinition name="z3-smt2">
     <option name="-smt2"/>
   </rundefinition>

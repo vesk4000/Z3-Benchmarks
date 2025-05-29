@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
+<benchmark tool="z3" displayName="Combined QF_BV Datasets" timelimit="15s" memlimit="2GB">
+
+  <description>Compare default and int-blast Z3 on QF_BV from SMT-COMP and VLSAT3</description>
+
+  <requiredfiles>
+    <!-- SMT-COMP QF_BV (only 10% of 10%, one folder) -->
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+    <!-- VLSAT3 QF_BV families a (unsat) and g (sat), ~20 instances (~10%) -->
+    <include>/benchmarks/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a0[0-9].smt2</include>
+    <include>/benchmarks/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_g0[0-9].smt2</include>
+  </requiredfiles>
+
+  <logfiles/>
+  <resultfiles/>
+
+  <!-- Run configurations -->
+  <rundefinition name="z3-int-blast">
+    <option name="-smt2"/>
+    <option name="sat.smt=true"/>
+    <option name="smt.bv.solver=2"/>
+  </rundefinition>
+  <rundefinition name="z3-smt2">
+    <option name="-smt2"/>
+  </rundefinition>
+
+  <!-- Task sets for each QF_BV source -->
+  <tasks name="VLSAT3-QF_BV">
+    <include>/benchmarks/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a0[0-9].smt2</include>
+    <include>/benchmarks/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_g0[0-9].smt2</include>
+  </tasks>
+  <tasks name="SMTCOMP-QF_BV">
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+  </tasks>
+
+</benchmark>
