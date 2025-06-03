@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
+<benchmark tool="z3" displayName="SMT-COMP QF_BV Benchmark" timelimit="60s" memlimit="2GB">
+
+  <description>Compare Z3 default vs. int-blast on full SMT-COMP QF_BV</description>
+
+  <requiredfiles>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170501-Heizmann-UltimateAutomizer/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170531-Hansen-Check/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+  </requiredfiles>
+
+  <logfiles/>
+  <resultfiles/>
+
+  <rundefinition name="z3-int-blast">
+    <option name="-smt2"/>
+    <option name="sat.smt=true"/>
+    <option name="smt.bv.solver=2"/>
+  </rundefinition>
+  <rundefinition name="z3-smt2">
+    <option name="-smt2"/>
+  </rundefinition>
+
+  <tasks name="SMT-COMP QF_BV">
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2017-BuchwaldFried/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170501-Heizmann-UltimateAutomizer/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/20170531-Hansen-Check/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Goel-hwbench/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2018-Mann/*.smt2</include>
+    <include>/benchmarks/QF_BV/non-incremental/QF_BV/2019-Mann/*.smt2</include>
+  </tasks>
+
+</benchmark>
