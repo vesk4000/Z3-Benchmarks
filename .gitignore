@@ -12,3 +12,7 @@ __pycache__/
 
 # VS Code workspace settings (optional if you store local settings elsewhere)
 .vscode/
+
+my-conda-env
+*.err
+*.out
