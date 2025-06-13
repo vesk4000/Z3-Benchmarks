@@ -6,14 +6,14 @@ import benchexec.result as result
 
 class Tool(benchexec.tools.template.BaseTool2):
     """
-    Tool info for Z3 (latest version).
+    Tool info for Z3 PolySAT.
     """
 
     def executable(self, tool_locator):
-        return tool_locator.find_executable("z3-latest")
+        return tool_locator.find_executable("z3-poly")
 
     def name(self):
-        return "Z3-Latest"
+        return "Z3-poly"
 
     def determine_result(self, run):
         """

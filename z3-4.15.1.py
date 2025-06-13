@@ -6,14 +6,14 @@ import benchexec.result as result
 
 class Tool(benchexec.tools.template.BaseTool2):
     """
-    Tool info for Z3 version 4.11.2.
+    Tool info for Z3 (latest version).
     """
 
     def executable(self, tool_locator):
-        return tool_locator.find_executable("z3-4.11.2")
+        return tool_locator.find_executable("z3-4.15.1")
 
     def name(self):
-        return "Z3-4.11.2"
+        return "Z3-4.15.1"
 
     def determine_result(self, run):
         """

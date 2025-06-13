@@ -36,25 +36,16 @@ RUN mkdir -p /opt/z3-versions
 #     && rm -rf build .git
 
 # Build Z3 latest (main branch)
-RUN git clone https://github.com/Z3Prover/z3.git z3-4.15.1 \
-    && cd z3-4.15.1 \
-    && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-4.15.1/install \
+RUN git clone https://github.com/Z3Prover/z3.git z3-4.15.0 \
+    && cd z3-4.15.0 \
+    && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-4.15.0/install \
     && cd build && make -j"$(nproc)" install \
     && rm -rf build .git
 
-# Build Z3 PolySAT
-# RUN git clone https://github.com/Z3Prover/z3.git z3-poly \
-#     && cd z3-poly \
-#     && git checkout 16fb86b636047fd79ad5827f768b6f26d8812948 \
-#     && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-poly/install \
-#     && cd build && make -j"$(nproc)" install \
-#     && rm -rf build .git
-
 # Create symlinks for easy access - default to latest
-RUN ln -s /opt/z3-versions/z3-4.15.1/install/bin/z3 /usr/local/bin/z3 \
-    #&& ln -s /opt/z3-versions/z3-poly/install/bin/z3 /usr/local/bin/z3-poly \ 
+RUN ln -s /opt/z3-versions/z3-4.15.0/install/bin/z3 /usr/local/bin/z3 \
     # && ln -s /opt/z3-versions/z3-4.12.0/install/bin/z3 /usr/local/bin/z3-4.12.0 \
-    && ln -s /opt/z3-versions/z3-4.15.1/install/bin/z3 /usr/local/bin/z3-4.15.1
+    && ln -s /opt/z3-versions/z3-4.15.0/install/bin/z3 /usr/local/bin/z3-4.15.0
 
 # Install Python packages that might be useful for benchmarking
 RUN pip3 install --break-system-packages \

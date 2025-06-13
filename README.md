@@ -9,6 +9,33 @@ This repository contains a Docker-based setup for benchmarking multiple versions
 - **VS Code dev container**: Easy development environment
 - **Security**: Runs as non-root user inside container
 
+
+## Sync Folders
+```bash
+rsync -av Benchmarking  vmitev@login.delftblue.tudelft.nl:/scratch/vmitev/ --exclude .git
+```
+
+see details about past jobs
+```
+sacct --starttime 2014-07-01 --format=User,JobID,Jobname%50,partition,state,time,start,end,elapsed,MaxRss,MaxVMSize,nnodes,ncpus,nodelist
+```
+
+see useage of nodes:
+```
+sinfo -o "%20P %5D %6t %8c %8z %15C %N"
+```
+
+## 1. Build & Publish the Base Image
+
+1. In your workspace directory (contains Dockerfile):
+   ```bash
+   docker build -t vesk4000/z3-benchmarks:v1 DockerfileSLRUM
+   ```
+2. (Optional) Push to Docker Hub or your registry:
+   ```bash
+   docker push vesk4000/z3-benchmarks:v1
+   ```
+
 ## Quick Start
 
 1. **Open in VS Code Dev Container**:

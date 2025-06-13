@@ -43,6 +43,6 @@
 	"mounts": [
 		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
 	],
-	"postCreateCommand": "bash persistent-setup.sh && if [ ! -d .git ]; then git init && echo 'Initialized Git repository'; fi",
+	"postCreateCommand": "echo 'Hello There'",
 	"postStartCommand": "CGROUP_PATH=\"$(grep -m1 '/docker/' /proc/self/cgroup | cut -d: -f3)\" && for s in cpuacct cpuset freezer memory; do sudo chmod o+wt \"/sys/fs/cgroup/$s$CGROUP_PATH\"; done && echo 'Container ready! Available Z3 versions: z3-latest, z3-4.12.0, z3-4.11.2' && echo 'BenchExec ready. Run: benchexec --help'"
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.18//EN" "https://www.sosy-lab.org/benchexec/benchmark-1.18.dtd">
+<benchmark tool="z3" displayName="VLSAT3 QF_BV Benchmark" timelimit="1500s" memlimit="2GB">
+
+  <description>Compare Z3 default vs. int-blast on full VLSAT3 QF_BV</description>
+
+  <requiredfiles>
+    <!-- QF_BV families a and g -->
+    <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/*.smt2</include>
+  </requiredfiles>
+
+  <logfiles/>
+  <resultfiles/>
+
+  <tasks name="VLSAT3 QF_BV">
+    <!-- <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_g00.smt2</include> -->
+    <!-- <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a4[0-5].smt2</include> -->
+    <!-- <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a3*.smt2</include> -->
+    <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a5*.smt2</include>
+    <include>./datasets/VLSAT3/cadp.inria.fr/ftp/benchmarks/vlsat/vlsat3_a6*.smt2</include>
+  </tasks>
+
+  <rundefinition name="z3-bit-blast">
+    <option name="-smt2"/>
+    <option name="tactic.default_tactic='(then simplify propagate-values solve-eqs ctx-simplify simplify smt)'"/>
+  </rundefinition>
+  <rundefinition name="z3-int-blast">
+    <option name="-smt2"/>
+    <option name="tactic.default_tactic='(then simplify propagate-values solve-eqs ctx-simplify simplify smt)'"/>
+    <option name="sat.smt=true"/>
+    <option name="smt.bv.solver=2"/>
+  </rundefinition>
+  <rundefinition name="z3-sls">
+    <option name="-smt2"/>
+    <option name="tactic.default_tactic='(then simplify propagate-values solve-eqs ctx-simplify simplify smt)'"/>
+    <option name="smt.sls.enable=true"/>
+    <option name="smt.sls.parallel=false"/>
+  </rundefinition>
+
+</benchmark>

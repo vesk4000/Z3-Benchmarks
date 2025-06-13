@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=vlsat-family-a-slurm
+#SBATCH --job-name=run3
 #SBATCH --partition=compute-p1
-#SBATCH --ntasks=16
+#SBATCH --ntasks=32
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=2800MB
-#SBATCH --time=03:10:00
+#SBATCH --mem-per-cpu=3200MB
+#SBATCH --time=03:55:00
 #SBATCH --output=../logs/%x-%j.out
 #SBATCH --error=../logs/%x-%j.err
 #SBATCH --mail-type=BEGIN
@@ -14,4 +14,4 @@ module load miniconda3
 conda activate /scratch/vmitev/Benchmarking/my-conda-env
 cd /scratch/vmitev/Benchmarking
 
-python3 benchy.py
+python3 benchy.py --name run3

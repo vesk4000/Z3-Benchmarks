@@ -18,7 +18,7 @@ ls results/smtcomp-qfbv-benchmark.*.html | sed 's/\.html$/.table.html/' || true
 # Run VLSAT3 QF_BV Benchmark
 
 echo "=== Running VLSAT3 QF_BV Benchmark ==="
-benchexec vlsat-qfbv-benchmark.xml --limitCores 1 --no-hyperthreading --numOfThreads 1
+benchexec vlsat3-benchmark.xml --limitCores 1 --no-hyperthreading --numOfThreads 1
 
 echo "--- Generating tables for VLSAT3 QF_BV ---"
 table-generator results/vlsat-qfbv-benchmark.*.bz2

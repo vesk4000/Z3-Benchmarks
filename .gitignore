@@ -16,3 +16,7 @@ __pycache__/
 my-conda-env
 *.err
 *.out
+
+.conda
+
+tmp
