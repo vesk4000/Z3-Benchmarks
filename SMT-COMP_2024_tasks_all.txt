@@ -7,6 +7,7 @@ SMT-COMP_2024/2018-Mann/fifo_data_integrity_w8d8b30.smt2
 SMT-COMP_2024/2019-Mann/digital-estimation-convergence-bmc-fwd.smt2
 SMT-COMP_2024/2019-Wolf-fmbench/2018E/picorv32-check-unrolled-nomem.smt2
 SMT-COMP_2024/2019-Wolf-fmbench/2018E/zipcpu-zipmmu-unrolled-nomem.smt2
+SMT-COMP_2024/2019-Wolf-fmbench/2019A/picorv32_mutAY_QF_BV_NONINCR.smt2
 SMT-COMP_2024/2019-Wolf-fmbench/2019A/picorv32_mutBX_QF_BV_NONINCR.smt2
 SMT-COMP_2024/2019-Wolf-fmbench/2019A/picorv32_mutCY_QF_BV_NONINCR.smt2
 SMT-COMP_2024/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_1000.smt2
@@ -545,29 +546,40 @@ SMT-COMP_2024/20210312-Bouvier/vlsat3_a00.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a01.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a02.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a03.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_a07.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a10.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a11.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a17.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a28.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_a38.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_a56.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g00.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g02.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g03.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g06.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g08.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g25.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g26.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g28.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g31.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g33.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g34.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g35.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g46.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g48.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g49.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g55.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g56.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g58.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g59.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g65.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g66.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g67.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g73.smt2
 SMT-COMP_2024/20210312-Bouvier/vlsat3_g84.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g86.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g90.smt2
+SMT-COMP_2024/20210312-Bouvier/vlsat3_g96.smt2
 SMT-COMP_2024/20221012-MCMPC/dualexecution/dualexecution.t1.i10.13c6c358.smt2
 SMT-COMP_2024/20221012-MCMPC/dualexecution/dualexecution.t1.i10.336e8419.smt2
 SMT-COMP_2024/20221012-MCMPC/dualexecution/dualexecution.t1.i10.33c9241b.smt2
@@ -2325,9 +2337,11 @@ SMT-COMP_2024/20221214-p4dfa-XiaoqiChen/TCP/tcp_open_bit8_na6_nr3_paired.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SLL-NESTED-8-32-src-sp-not-excluded.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-1024-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-12-1024.smt2
+SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-16-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-16-16.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-20-20.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-256-256.smt2
+SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-48-48.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-512-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-512-512.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRAI-SAFE-8-1024.smt2
@@ -2336,6 +2350,7 @@ SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-128-128.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-16-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-20-20.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-256-1024.smt2
+SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-32-32.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-512-512.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRL-SAFE-64-64.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-1024-1024.smt2
@@ -2344,16 +2359,21 @@ SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-20-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-20-20.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-24-24.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-256-1024.smt2
+SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-32-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-32-32.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-512-512.smt2
+SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-64-64.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-8-1024.smt2
 SMT-COMP_2024/20230221-oisc-gurtner/SRLI-SAFE-80-80.smt2
+SMT-COMP_2024/20230224-grsbits-truby/grs-128-16.smt2
 SMT-COMP_2024/20230224-grsbits-truby/grs-32-16.smt2
+SMT-COMP_2024/20230224-grsbits-truby/grs-32-32.smt2
 SMT-COMP_2024/20230224-grsbits-truby/grs-96-16.smt2
 SMT-COMP_2024/20230321-UltimateAutomizerSvcomp2023/cohencu.c_0.smt2
 SMT-COMP_2024/20230321-UltimateAutomizerSvcomp2023/cohencu.c_4.smt2
 SMT-COMP_2024/RWS/Example_13.txt.smt2
 SMT-COMP_2024/RWS/Example_17.txt.smt2
+SMT-COMP_2024/RWS/Example_18.txt.smt2
 SMT-COMP_2024/RWS/Example_3.txt.smt2
 SMT-COMP_2024/Sage2/bench_10.smt2
 SMT-COMP_2024/Sage2/bench_1000.smt2
@@ -2369,6 +2389,7 @@ SMT-COMP_2024/Sage2/bench_10068.smt2
 SMT-COMP_2024/Sage2/bench_10085.smt2
 SMT-COMP_2024/Sage2/bench_10091.smt2
 SMT-COMP_2024/Sage2/bench_10092.smt2
+SMT-COMP_2024/Sage2/bench_10096.smt2
 SMT-COMP_2024/Sage2/bench_10111.smt2
 SMT-COMP_2024/Sage2/bench_10120.smt2
 SMT-COMP_2024/Sage2/bench_10121.smt2
@@ -2392,6 +2413,7 @@ SMT-COMP_2024/Sage2/bench_10226.smt2
 SMT-COMP_2024/Sage2/bench_10240.smt2
 SMT-COMP_2024/Sage2/bench_10266.smt2
 SMT-COMP_2024/Sage2/bench_10275.smt2
+SMT-COMP_2024/Sage2/bench_10277.smt2
 SMT-COMP_2024/Sage2/bench_1028.smt2
 SMT-COMP_2024/Sage2/bench_10302.smt2
 SMT-COMP_2024/Sage2/bench_10305.smt2
@@ -2430,6 +2452,7 @@ SMT-COMP_2024/Sage2/bench_10591.smt2
 SMT-COMP_2024/Sage2/bench_10594.smt2
 SMT-COMP_2024/Sage2/bench_10598.smt2
 SMT-COMP_2024/Sage2/bench_10600.smt2
+SMT-COMP_2024/Sage2/bench_10602.smt2
 SMT-COMP_2024/Sage2/bench_10611.smt2
 SMT-COMP_2024/Sage2/bench_10614.smt2
 SMT-COMP_2024/Sage2/bench_10616.smt2
@@ -2452,11 +2475,13 @@ SMT-COMP_2024/Sage2/bench_10714.smt2
 SMT-COMP_2024/Sage2/bench_10734.smt2
 SMT-COMP_2024/Sage2/bench_10737.smt2
 SMT-COMP_2024/Sage2/bench_10741.smt2
+SMT-COMP_2024/Sage2/bench_10754.smt2
 SMT-COMP_2024/Sage2/bench_10755.smt2
 SMT-COMP_2024/Sage2/bench_1076.smt2
 SMT-COMP_2024/Sage2/bench_10764.smt2
 SMT-COMP_2024/Sage2/bench_10771.smt2
 SMT-COMP_2024/Sage2/bench_10773.smt2
+SMT-COMP_2024/Sage2/bench_10784.smt2
 SMT-COMP_2024/Sage2/bench_10788.smt2
 SMT-COMP_2024/Sage2/bench_1079.smt2
 SMT-COMP_2024/Sage2/bench_10793.smt2
@@ -2554,6 +2579,7 @@ SMT-COMP_2024/Sage2/bench_11369.smt2
 SMT-COMP_2024/Sage2/bench_1137.smt2
 SMT-COMP_2024/Sage2/bench_11380.smt2
 SMT-COMP_2024/Sage2/bench_11381.smt2
+SMT-COMP_2024/Sage2/bench_11385.smt2
 SMT-COMP_2024/Sage2/bench_11386.smt2
 SMT-COMP_2024/Sage2/bench_11398.smt2
 SMT-COMP_2024/Sage2/bench_11402.smt2
@@ -2572,6 +2598,7 @@ SMT-COMP_2024/Sage2/bench_11461.smt2
 SMT-COMP_2024/Sage2/bench_11462.smt2
 SMT-COMP_2024/Sage2/bench_11463.smt2
 SMT-COMP_2024/Sage2/bench_11464.smt2
+SMT-COMP_2024/Sage2/bench_11467.smt2
 SMT-COMP_2024/Sage2/bench_11468.smt2
 SMT-COMP_2024/Sage2/bench_11469.smt2
 SMT-COMP_2024/Sage2/bench_11473.smt2
@@ -2599,6 +2626,7 @@ SMT-COMP_2024/Sage2/bench_11593.smt2
 SMT-COMP_2024/Sage2/bench_11594.smt2
 SMT-COMP_2024/Sage2/bench_11597.smt2
 SMT-COMP_2024/Sage2/bench_11606.smt2
+SMT-COMP_2024/Sage2/bench_11610.smt2
 SMT-COMP_2024/Sage2/bench_11616.smt2
 SMT-COMP_2024/Sage2/bench_11618.smt2
 SMT-COMP_2024/Sage2/bench_11634.smt2
@@ -2802,6 +2830,7 @@ SMT-COMP_2024/Sage2/bench_12808.smt2
 SMT-COMP_2024/Sage2/bench_12821.smt2
 SMT-COMP_2024/Sage2/bench_12829.smt2
 SMT-COMP_2024/Sage2/bench_12831.smt2
+SMT-COMP_2024/Sage2/bench_12833.smt2
 SMT-COMP_2024/Sage2/bench_12837.smt2
 SMT-COMP_2024/Sage2/bench_12839.smt2
 SMT-COMP_2024/Sage2/bench_1284.smt2
@@ -2901,6 +2930,7 @@ SMT-COMP_2024/Sage2/bench_13506.smt2
 SMT-COMP_2024/Sage2/bench_13509.smt2
 SMT-COMP_2024/Sage2/bench_1351.smt2
 SMT-COMP_2024/Sage2/bench_13513.smt2
+SMT-COMP_2024/Sage2/bench_13515.smt2
 SMT-COMP_2024/Sage2/bench_13522.smt2
 SMT-COMP_2024/Sage2/bench_13529.smt2
 SMT-COMP_2024/Sage2/bench_13531.smt2
@@ -2909,6 +2939,7 @@ SMT-COMP_2024/Sage2/bench_13547.smt2
 SMT-COMP_2024/Sage2/bench_13554.smt2
 SMT-COMP_2024/Sage2/bench_13569.smt2
 SMT-COMP_2024/Sage2/bench_1357.smt2
+SMT-COMP_2024/Sage2/bench_13572.smt2
 SMT-COMP_2024/Sage2/bench_13576.smt2
 SMT-COMP_2024/Sage2/bench_13578.smt2
 SMT-COMP_2024/Sage2/bench_13585.smt2
@@ -2929,7 +2960,9 @@ SMT-COMP_2024/Sage2/bench_1371.smt2
 SMT-COMP_2024/Sage2/bench_13713.smt2
 SMT-COMP_2024/Sage2/bench_13714.smt2
 SMT-COMP_2024/Sage2/bench_13716.smt2
+SMT-COMP_2024/Sage2/bench_13728.smt2
 SMT-COMP_2024/Sage2/bench_1373.smt2
+SMT-COMP_2024/Sage2/bench_13744.smt2
 SMT-COMP_2024/Sage2/bench_13749.smt2
 SMT-COMP_2024/Sage2/bench_13764.smt2
 SMT-COMP_2024/Sage2/bench_13776.smt2
@@ -2945,6 +2978,7 @@ SMT-COMP_2024/Sage2/bench_13850.smt2
 SMT-COMP_2024/Sage2/bench_13854.smt2
 SMT-COMP_2024/Sage2/bench_13861.smt2
 SMT-COMP_2024/Sage2/bench_13867.smt2
+SMT-COMP_2024/Sage2/bench_13869.smt2
 SMT-COMP_2024/Sage2/bench_13874.smt2
 SMT-COMP_2024/Sage2/bench_1388.smt2
 SMT-COMP_2024/Sage2/bench_13880.smt2
@@ -2959,10 +2993,12 @@ SMT-COMP_2024/Sage2/bench_1394.smt2
 SMT-COMP_2024/Sage2/bench_13943.smt2
 SMT-COMP_2024/Sage2/bench_13962.smt2
 SMT-COMP_2024/Sage2/bench_13977.smt2
+SMT-COMP_2024/Sage2/bench_14.smt2
 SMT-COMP_2024/Sage2/bench_14015.smt2
 SMT-COMP_2024/Sage2/bench_14029.smt2
 SMT-COMP_2024/Sage2/bench_14040.smt2
 SMT-COMP_2024/Sage2/bench_14042.smt2
+SMT-COMP_2024/Sage2/bench_14048.smt2
 SMT-COMP_2024/Sage2/bench_14054.smt2
 SMT-COMP_2024/Sage2/bench_14055.smt2
 SMT-COMP_2024/Sage2/bench_14058.smt2
@@ -2974,12 +3010,15 @@ SMT-COMP_2024/Sage2/bench_14089.smt2
 SMT-COMP_2024/Sage2/bench_14094.smt2
 SMT-COMP_2024/Sage2/bench_14115.smt2
 SMT-COMP_2024/Sage2/bench_14125.smt2
+SMT-COMP_2024/Sage2/bench_1413.smt2
 SMT-COMP_2024/Sage2/bench_1415.smt2
 SMT-COMP_2024/Sage2/bench_14152.smt2
 SMT-COMP_2024/Sage2/bench_14156.smt2
 SMT-COMP_2024/Sage2/bench_14158.smt2
+SMT-COMP_2024/Sage2/bench_14161.smt2
 SMT-COMP_2024/Sage2/bench_14165.smt2
 SMT-COMP_2024/Sage2/bench_1417.smt2
+SMT-COMP_2024/Sage2/bench_14170.smt2
 SMT-COMP_2024/Sage2/bench_14173.smt2
 SMT-COMP_2024/Sage2/bench_14184.smt2
 SMT-COMP_2024/Sage2/bench_1419.smt2
@@ -3045,6 +3084,7 @@ SMT-COMP_2024/Sage2/bench_14578.smt2
 SMT-COMP_2024/Sage2/bench_14587.smt2
 SMT-COMP_2024/Sage2/bench_14595.smt2
 SMT-COMP_2024/Sage2/bench_14601.smt2
+SMT-COMP_2024/Sage2/bench_14629.smt2
 SMT-COMP_2024/Sage2/bench_14632.smt2
 SMT-COMP_2024/Sage2/bench_14633.smt2
 SMT-COMP_2024/Sage2/bench_14635.smt2
@@ -3054,6 +3094,7 @@ SMT-COMP_2024/Sage2/bench_14669.smt2
 SMT-COMP_2024/Sage2/bench_1467.smt2
 SMT-COMP_2024/Sage2/bench_14695.smt2
 SMT-COMP_2024/Sage2/bench_14698.smt2
+SMT-COMP_2024/Sage2/bench_147.smt2
 SMT-COMP_2024/Sage2/bench_14717.smt2
 SMT-COMP_2024/Sage2/bench_14732.smt2
 SMT-COMP_2024/Sage2/bench_14734.smt2
@@ -3113,6 +3154,7 @@ SMT-COMP_2024/Sage2/bench_15105.smt2
 SMT-COMP_2024/Sage2/bench_15114.smt2
 SMT-COMP_2024/Sage2/bench_15115.smt2
 SMT-COMP_2024/Sage2/bench_15117.smt2
+SMT-COMP_2024/Sage2/bench_15157.smt2
 SMT-COMP_2024/Sage2/bench_15158.smt2
 SMT-COMP_2024/Sage2/bench_15161.smt2
 SMT-COMP_2024/Sage2/bench_15164.smt2
@@ -3194,6 +3236,8 @@ SMT-COMP_2024/Sage2/bench_15723.smt2
 SMT-COMP_2024/Sage2/bench_15732.smt2
 SMT-COMP_2024/Sage2/bench_15733.smt2
 SMT-COMP_2024/Sage2/bench_15734.smt2
+SMT-COMP_2024/Sage2/bench_15735.smt2
+SMT-COMP_2024/Sage2/bench_15742.smt2
 SMT-COMP_2024/Sage2/bench_15749.smt2
 SMT-COMP_2024/Sage2/bench_15773.smt2
 SMT-COMP_2024/Sage2/bench_15783.smt2
@@ -3263,6 +3307,7 @@ SMT-COMP_2024/Sage2/bench_16324.smt2
 SMT-COMP_2024/Sage2/bench_16325.smt2
 SMT-COMP_2024/Sage2/bench_16332.smt2
 SMT-COMP_2024/Sage2/bench_16333.smt2
+SMT-COMP_2024/Sage2/bench_16356.smt2
 SMT-COMP_2024/Sage2/bench_16362.smt2
 SMT-COMP_2024/Sage2/bench_16376.smt2
 SMT-COMP_2024/Sage2/bench_16377.smt2
@@ -3275,6 +3320,7 @@ SMT-COMP_2024/Sage2/bench_16403.smt2
 SMT-COMP_2024/Sage2/bench_16405.smt2
 SMT-COMP_2024/Sage2/bench_16409.smt2
 SMT-COMP_2024/Sage2/bench_16413.smt2
+SMT-COMP_2024/Sage2/bench_16419.smt2
 SMT-COMP_2024/Sage2/bench_1642.smt2
 SMT-COMP_2024/Sage2/bench_16423.smt2
 SMT-COMP_2024/Sage2/bench_16427.smt2
@@ -3283,6 +3329,7 @@ SMT-COMP_2024/Sage2/bench_16433.smt2
 SMT-COMP_2024/Sage2/bench_16447.smt2
 SMT-COMP_2024/Sage2/bench_16450.smt2
 SMT-COMP_2024/Sage2/bench_16459.smt2
+SMT-COMP_2024/Sage2/bench_16460.smt2
 SMT-COMP_2024/Sage2/bench_16463.smt2
 SMT-COMP_2024/Sage2/bench_16465.smt2
 SMT-COMP_2024/Sage2/bench_16468.smt2
@@ -3315,6 +3362,7 @@ SMT-COMP_2024/Sage2/bench_16691.smt2
 SMT-COMP_2024/Sage2/bench_1671.smt2
 SMT-COMP_2024/Sage2/bench_16716.smt2
 SMT-COMP_2024/Sage2/bench_16728.smt2
+SMT-COMP_2024/Sage2/bench_1673.smt2
 SMT-COMP_2024/Sage2/bench_16739.smt2
 SMT-COMP_2024/Sage2/bench_16748.smt2
 SMT-COMP_2024/Sage2/bench_16760.smt2
@@ -3323,6 +3371,8 @@ SMT-COMP_2024/Sage2/bench_16781.smt2
 SMT-COMP_2024/Sage2/bench_16803.smt2
 SMT-COMP_2024/Sage2/bench_16833.smt2
 SMT-COMP_2024/Sage2/bench_16841.smt2
+SMT-COMP_2024/Sage2/bench_16852.smt2
+SMT-COMP_2024/Sage2/bench_16862.smt2
 SMT-COMP_2024/Sage2/bench_16872.smt2
 SMT-COMP_2024/Sage2/bench_16873.smt2
 SMT-COMP_2024/Sage2/bench_1688.smt2
@@ -3342,6 +3392,7 @@ SMT-COMP_2024/Sage2/bench_1694.smt2
 SMT-COMP_2024/Sage2/bench_16951.smt2
 SMT-COMP_2024/Sage2/bench_16955.smt2
 SMT-COMP_2024/Sage2/bench_16957.smt2
+SMT-COMP_2024/Sage2/bench_16966.smt2
 SMT-COMP_2024/Sage2/bench_16971.smt2
 SMT-COMP_2024/Sage2/bench_16975.smt2
 SMT-COMP_2024/Sage2/bench_1699.smt2
@@ -3349,6 +3400,7 @@ SMT-COMP_2024/Sage2/bench_17023.smt2
 SMT-COMP_2024/Sage2/bench_17031.smt2
 SMT-COMP_2024/Sage2/bench_17032.smt2
 SMT-COMP_2024/Sage2/bench_1704.smt2
+SMT-COMP_2024/Sage2/bench_17055.smt2
 SMT-COMP_2024/Sage2/bench_1706.smt2
 SMT-COMP_2024/Sage2/bench_17082.smt2
 SMT-COMP_2024/Sage2/bench_1710.smt2
@@ -3358,6 +3410,7 @@ SMT-COMP_2024/Sage2/bench_17128.smt2
 SMT-COMP_2024/Sage2/bench_1715.smt2
 SMT-COMP_2024/Sage2/bench_1717.smt2
 SMT-COMP_2024/Sage2/bench_17173.smt2
+SMT-COMP_2024/Sage2/bench_17175.smt2
 SMT-COMP_2024/Sage2/bench_17195.smt2
 SMT-COMP_2024/Sage2/bench_17196.smt2
 SMT-COMP_2024/Sage2/bench_17201.smt2
@@ -3367,6 +3420,7 @@ SMT-COMP_2024/Sage2/bench_17218.smt2
 SMT-COMP_2024/Sage2/bench_1722.smt2
 SMT-COMP_2024/Sage2/bench_17222.smt2
 SMT-COMP_2024/Sage2/bench_17223.smt2
+SMT-COMP_2024/Sage2/bench_17234.smt2
 SMT-COMP_2024/Sage2/bench_17237.smt2
 SMT-COMP_2024/Sage2/bench_1724.smt2
 SMT-COMP_2024/Sage2/bench_17265.smt2
@@ -3379,6 +3433,7 @@ SMT-COMP_2024/Sage2/bench_17335.smt2
 SMT-COMP_2024/Sage2/bench_1734.smt2
 SMT-COMP_2024/Sage2/bench_17342.smt2
 SMT-COMP_2024/Sage2/bench_1736.smt2
+SMT-COMP_2024/Sage2/bench_17362.smt2
 SMT-COMP_2024/Sage2/bench_1738.smt2
 SMT-COMP_2024/Sage2/bench_17381.smt2
 SMT-COMP_2024/Sage2/bench_17415.smt2
@@ -3446,6 +3501,7 @@ SMT-COMP_2024/Sage2/bench_1851.smt2
 SMT-COMP_2024/Sage2/bench_1855.smt2
 SMT-COMP_2024/Sage2/bench_186.smt2
 SMT-COMP_2024/Sage2/bench_1867.smt2
+SMT-COMP_2024/Sage2/bench_1870.smt2
 SMT-COMP_2024/Sage2/bench_1872.smt2
 SMT-COMP_2024/Sage2/bench_1879.smt2
 SMT-COMP_2024/Sage2/bench_1891.smt2
@@ -3548,6 +3604,7 @@ SMT-COMP_2024/Sage2/bench_246.smt2
 SMT-COMP_2024/Sage2/bench_2468.smt2
 SMT-COMP_2024/Sage2/bench_2475.smt2
 SMT-COMP_2024/Sage2/bench_2485.smt2
+SMT-COMP_2024/Sage2/bench_2492.smt2
 SMT-COMP_2024/Sage2/bench_2495.smt2
 SMT-COMP_2024/Sage2/bench_2497.smt2
 SMT-COMP_2024/Sage2/bench_25.smt2
@@ -3632,6 +3689,7 @@ SMT-COMP_2024/Sage2/bench_2879.smt2
 SMT-COMP_2024/Sage2/bench_2883.smt2
 SMT-COMP_2024/Sage2/bench_2887.smt2
 SMT-COMP_2024/Sage2/bench_2889.smt2
+SMT-COMP_2024/Sage2/bench_2895.smt2
 SMT-COMP_2024/Sage2/bench_2905.smt2
 SMT-COMP_2024/Sage2/bench_2910.smt2
 SMT-COMP_2024/Sage2/bench_2915.smt2
@@ -3694,6 +3752,7 @@ SMT-COMP_2024/Sage2/bench_3190.smt2
 SMT-COMP_2024/Sage2/bench_3194.smt2
 SMT-COMP_2024/Sage2/bench_3205.smt2
 SMT-COMP_2024/Sage2/bench_3207.smt2
+SMT-COMP_2024/Sage2/bench_3211.smt2
 SMT-COMP_2024/Sage2/bench_3214.smt2
 SMT-COMP_2024/Sage2/bench_3216.smt2
 SMT-COMP_2024/Sage2/bench_3218.smt2
@@ -3797,6 +3856,7 @@ SMT-COMP_2024/Sage2/bench_3766.smt2
 SMT-COMP_2024/Sage2/bench_3769.smt2
 SMT-COMP_2024/Sage2/bench_3772.smt2
 SMT-COMP_2024/Sage2/bench_3778.smt2
+SMT-COMP_2024/Sage2/bench_3780.smt2
 SMT-COMP_2024/Sage2/bench_3785.smt2
 SMT-COMP_2024/Sage2/bench_3795.smt2
 SMT-COMP_2024/Sage2/bench_3797.smt2
@@ -3849,6 +3909,8 @@ SMT-COMP_2024/Sage2/bench_4157.smt2
 SMT-COMP_2024/Sage2/bench_4161.smt2
 SMT-COMP_2024/Sage2/bench_4170.smt2
 SMT-COMP_2024/Sage2/bench_4185.smt2
+SMT-COMP_2024/Sage2/bench_4189.smt2
+SMT-COMP_2024/Sage2/bench_4190.smt2
 SMT-COMP_2024/Sage2/bench_4197.smt2
 SMT-COMP_2024/Sage2/bench_4199.smt2
 SMT-COMP_2024/Sage2/bench_4219.smt2
@@ -3885,6 +3947,7 @@ SMT-COMP_2024/Sage2/bench_4404.smt2
 SMT-COMP_2024/Sage2/bench_4408.smt2
 SMT-COMP_2024/Sage2/bench_4410.smt2
 SMT-COMP_2024/Sage2/bench_4411.smt2
+SMT-COMP_2024/Sage2/bench_4425.smt2
 SMT-COMP_2024/Sage2/bench_4427.smt2
 SMT-COMP_2024/Sage2/bench_4432.smt2
 SMT-COMP_2024/Sage2/bench_4438.smt2
@@ -3916,6 +3979,7 @@ SMT-COMP_2024/Sage2/bench_4597.smt2
 SMT-COMP_2024/Sage2/bench_4603.smt2
 SMT-COMP_2024/Sage2/bench_4612.smt2
 SMT-COMP_2024/Sage2/bench_4614.smt2
+SMT-COMP_2024/Sage2/bench_4615.smt2
 SMT-COMP_2024/Sage2/bench_4616.smt2
 SMT-COMP_2024/Sage2/bench_4622.smt2
 SMT-COMP_2024/Sage2/bench_4631.smt2
@@ -3962,6 +4026,7 @@ SMT-COMP_2024/Sage2/bench_4872.smt2
 SMT-COMP_2024/Sage2/bench_4881.smt2
 SMT-COMP_2024/Sage2/bench_4882.smt2
 SMT-COMP_2024/Sage2/bench_4886.smt2
+SMT-COMP_2024/Sage2/bench_4888.smt2
 SMT-COMP_2024/Sage2/bench_4889.smt2
 SMT-COMP_2024/Sage2/bench_489.smt2
 SMT-COMP_2024/Sage2/bench_4890.smt2
@@ -4141,6 +4206,7 @@ SMT-COMP_2024/Sage2/bench_5907.smt2
 SMT-COMP_2024/Sage2/bench_5912.smt2
 SMT-COMP_2024/Sage2/bench_5918.smt2
 SMT-COMP_2024/Sage2/bench_5923.smt2
+SMT-COMP_2024/Sage2/bench_5925.smt2
 SMT-COMP_2024/Sage2/bench_5927.smt2
 SMT-COMP_2024/Sage2/bench_5928.smt2
 SMT-COMP_2024/Sage2/bench_5929.smt2
@@ -4150,6 +4216,7 @@ SMT-COMP_2024/Sage2/bench_5977.smt2
 SMT-COMP_2024/Sage2/bench_5985.smt2
 SMT-COMP_2024/Sage2/bench_5990.smt2
 SMT-COMP_2024/Sage2/bench_5994.smt2
+SMT-COMP_2024/Sage2/bench_6.smt2
 SMT-COMP_2024/Sage2/bench_6002.smt2
 SMT-COMP_2024/Sage2/bench_6003.smt2
 SMT-COMP_2024/Sage2/bench_6006.smt2
@@ -4262,6 +4329,7 @@ SMT-COMP_2024/Sage2/bench_6926.smt2
 SMT-COMP_2024/Sage2/bench_6947.smt2
 SMT-COMP_2024/Sage2/bench_6951.smt2
 SMT-COMP_2024/Sage2/bench_6953.smt2
+SMT-COMP_2024/Sage2/bench_6956.smt2
 SMT-COMP_2024/Sage2/bench_6960.smt2
 SMT-COMP_2024/Sage2/bench_6963.smt2
 SMT-COMP_2024/Sage2/bench_6965.smt2
@@ -4404,6 +4472,7 @@ SMT-COMP_2024/Sage2/bench_8303.smt2
 SMT-COMP_2024/Sage2/bench_8306.smt2
 SMT-COMP_2024/Sage2/bench_8307.smt2
 SMT-COMP_2024/Sage2/bench_8311.smt2
+SMT-COMP_2024/Sage2/bench_8318.smt2
 SMT-COMP_2024/Sage2/bench_8351.smt2
 SMT-COMP_2024/Sage2/bench_8355.smt2
 SMT-COMP_2024/Sage2/bench_8370.smt2
@@ -4412,6 +4481,7 @@ SMT-COMP_2024/Sage2/bench_8380.smt2
 SMT-COMP_2024/Sage2/bench_840.smt2
 SMT-COMP_2024/Sage2/bench_8423.smt2
 SMT-COMP_2024/Sage2/bench_8442.smt2
+SMT-COMP_2024/Sage2/bench_845.smt2
 SMT-COMP_2024/Sage2/bench_8450.smt2
 SMT-COMP_2024/Sage2/bench_8452.smt2
 SMT-COMP_2024/Sage2/bench_8461.smt2
@@ -4437,6 +4507,7 @@ SMT-COMP_2024/Sage2/bench_8652.smt2
 SMT-COMP_2024/Sage2/bench_8656.smt2
 SMT-COMP_2024/Sage2/bench_866.smt2
 SMT-COMP_2024/Sage2/bench_867.smt2
+SMT-COMP_2024/Sage2/bench_8674.smt2
 SMT-COMP_2024/Sage2/bench_8683.smt2
 SMT-COMP_2024/Sage2/bench_869.smt2
 SMT-COMP_2024/Sage2/bench_871.smt2
@@ -4459,6 +4530,7 @@ SMT-COMP_2024/Sage2/bench_8919.smt2
 SMT-COMP_2024/Sage2/bench_8934.smt2
 SMT-COMP_2024/Sage2/bench_8942.smt2
 SMT-COMP_2024/Sage2/bench_8948.smt2
+SMT-COMP_2024/Sage2/bench_8958.smt2
 SMT-COMP_2024/Sage2/bench_8980.smt2
 SMT-COMP_2024/Sage2/bench_8984.smt2
 SMT-COMP_2024/Sage2/bench_8986.smt2
@@ -4509,6 +4581,7 @@ SMT-COMP_2024/Sage2/bench_9377.smt2
 SMT-COMP_2024/Sage2/bench_9378.smt2
 SMT-COMP_2024/Sage2/bench_9379.smt2
 SMT-COMP_2024/Sage2/bench_9386.smt2
+SMT-COMP_2024/Sage2/bench_9414.smt2
 SMT-COMP_2024/Sage2/bench_9422.smt2
 SMT-COMP_2024/Sage2/bench_9426.smt2
 SMT-COMP_2024/Sage2/bench_9444.smt2
@@ -4589,6 +4662,8 @@ SMT-COMP_2024/Sage2/bench_9946.smt2
 SMT-COMP_2024/Sage2/bench_9950.smt2
 SMT-COMP_2024/Sage2/bench_996.smt2
 SMT-COMP_2024/Sage2/bench_9968.smt2
+SMT-COMP_2024/Sage2/bench_9988.smt2
+SMT-COMP_2024/Sage2/bench_9991.smt2
 SMT-COMP_2024/Sage2/bench_9996.smt2
 SMT-COMP_2024/VS3/VS3-benchmark-A7.smt2
 SMT-COMP_2024/VS3/VS3-benchmark-S1.smt2
@@ -4630,12 +4705,17 @@ SMT-COMP_2024/asp/ConnectedDominatingSet/rand_65_500_1235857888_0_k=5_unsat.gph.
 SMT-COMP_2024/asp/ConnectedDominatingSet/rand_65_500_1235857888_0_k=6_sat.gph.smt2
 SMT-COMP_2024/asp/ConnectedDominatingSet/rand_70_250_1235844252_0_k=10_unsat.gph.smt2
 SMT-COMP_2024/asp/ConnectedDominatingSet/rand_90_600_1235859689_0_k=10_sat.gph.smt2
+SMT-COMP_2024/asp/DisjunctiveScheduling/disjunctiveScheduling.in1.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=7-height=7-colours=11.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=7-height=7-colours=12.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=7-height=7-colours=13.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=7-height=7-colours=14.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=8-height=8-colours=11.smt2
 SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=8-height=8-colours=14.smt2
+SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=9-height=9-colours=12.smt2
+SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=9-height=9-colours=13.smt2
+SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=9-height=9-colours=6.smt2
+SMT-COMP_2024/asp/EdgeMatching/edge-matching-width=9-height=9-colours=8.smt2
 SMT-COMP_2024/asp/Fastfood/a2.9.38.asp.smt2
 SMT-COMP_2024/asp/Fastfood/a7.3.0.tweaked.5.asp.smt2
 SMT-COMP_2024/asp/Fastfood/a7.3.3.asp.smt2
@@ -4666,8 +4746,10 @@ SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=125-density=0.1-instance=
 SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=125-density=0.1-instance=7.smt2
 SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=130-density=0.1-instance=10.smt2
 SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=130-density=0.1-instance=2.smt2
+SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=145-density=0.1-instance=2.smt2
 SMT-COMP_2024/asp/GraphColouring/graph-colouring-nodes=145-density=0.1-instance=8.smt2
 SMT-COMP_2024/asp/GraphPartitioning/rand_15_75_1235849326_0_k=3_v=7_e=30_sat.gph.smt2
+SMT-COMP_2024/asp/GraphPartitioning/rand_20_100_1235851242_0_k=3_v=15_e=25_sat.gph.smt2
 SMT-COMP_2024/asp/GraphPartitioning/rand_24_250_1235873539_0_k=6_v=9_e=25_sat.gph.smt2
 SMT-COMP_2024/asp/GraphPartitioning/rand_25_300_1235843609_0_k=3_v=8_e=15_unsat.gph.smt2
 SMT-COMP_2024/asp/GraphPartitioning/rand_30_300_1235855358_0_k=6_v=6_e=30_sat.gph.smt2
@@ -4698,6 +4780,7 @@ SMT-COMP_2024/asp/HierarchicalClustering/xy.14.x.14.r.3.886831626.391915.data_k=
 SMT-COMP_2024/asp/HierarchicalClustering/xy.15.x.15.r.4.10790636.1242605.data_k=4_l=4_sat.gph.smt2
 SMT-COMP_2024/asp/KnightTour/knightTour.in02.smt2
 SMT-COMP_2024/asp/KnightTour/knightTour.in03.smt2
+SMT-COMP_2024/asp/Labyrinth/laby_18_18_14.lp.smt2
 SMT-COMP_2024/asp/MazeGeneration/maze-generation-width=12-height=12-density=0.01-run=1.smt2
 SMT-COMP_2024/asp/MazeGeneration/maze-generation-width=14-height=14-density=0.01-run=3.smt2
 SMT-COMP_2024/asp/MazeGeneration/maze-generation-width=15-height=15-density=0.01-run=3.smt2
@@ -4743,6 +4826,7 @@ SMT-COMP_2024/asp/Solitaire/solitaire-center-time=29.smt2
 SMT-COMP_2024/asp/Solitaire/solitaire-edge-time=24.smt2
 SMT-COMP_2024/asp/Solitaire/solitaire-edge-time=25.smt2
 SMT-COMP_2024/asp/Solitaire/solitaire-edge-time=27.smt2
+SMT-COMP_2024/asp/Solitaire/solitaire-edge-time=29.smt2
 SMT-COMP_2024/asp/Sudoku/sudoku.in2.smt2
 SMT-COMP_2024/asp/Sudoku/sudoku.in3.smt2
 SMT-COMP_2024/asp/Sudoku/sudoku.in5.smt2
@@ -4778,7 +4862,9 @@ SMT-COMP_2024/asp/WeightBoundedDominatingSet/rand_200_800_1159728969_7.lp.smt2
 SMT-COMP_2024/asp/WeightBoundedDominatingSet/rand_200_800_1159728969_9.lp.smt2
 SMT-COMP_2024/asp/WireRouting/wire.14.x.14.b.8.a.20_unsat.data.smt2
 SMT-COMP_2024/asp/WireRouting/wire.14.x.14.b.8.a.30_unsat.data.smt2
+SMT-COMP_2024/asp/WireRouting/wire.15.x.15.b.10.a.20_sat.data.smt2
 SMT-COMP_2024/asp/WireRouting/wire.15.x.15.b.10.a.30_sat.data.smt2
+SMT-COMP_2024/asp/WireRouting/wire.16.x.16.b.10.a.20_unsat.data.smt2
 SMT-COMP_2024/bmc-bv-svcomp14/byte_add_1_true.c.17.smt2
 SMT-COMP_2024/bmc-bv-svcomp14/byte_add_false.c.21.smt2
 SMT-COMP_2024/bmc-bv-svcomp14/gcd_1_true.c.17.smt2
@@ -4832,6 +4918,7 @@ SMT-COMP_2024/brummayerbiere2/smulov3bw0896.smt2
 SMT-COMP_2024/brummayerbiere2/umulov1bw032.smt2
 SMT-COMP_2024/brummayerbiere2/umulov1bw048.smt2
 SMT-COMP_2024/brummayerbiere2/umulov1bw096.smt2
+SMT-COMP_2024/brummayerbiere2/umulov1bw112.smt2
 SMT-COMP_2024/brummayerbiere2/umulov2bw0128.smt2
 SMT-COMP_2024/brummayerbiere2/umulov2bw0384.smt2
 SMT-COMP_2024/brummayerbiere2/umulov2bw0512.smt2
@@ -4853,6 +4940,7 @@ SMT-COMP_2024/brummayerbiere3/minor032.smt2
 SMT-COMP_2024/brummayerbiere3/minor064.smt2
 SMT-COMP_2024/brummayerbiere3/minxorminand008.smt2
 SMT-COMP_2024/brummayerbiere3/minxorminand016.smt2
+SMT-COMP_2024/brummayerbiere4/unconstrained08.smt2
 SMT-COMP_2024/bruttomesso/core/ext_con_004_001_1024.smt2
 SMT-COMP_2024/bruttomesso/core/ext_con_004_002_1024.smt2
 SMT-COMP_2024/bruttomesso/core/ext_con_004_004_1024.smt2
@@ -5262,6 +5350,8 @@ SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_143_048.smt2
 SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_143_064.smt2
 SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_159_016.smt2
 SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_159_032.smt2
+SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_159_080.smt2
+SMT-COMP_2024/bruttomesso/lfsr/lfsr_008_159_112.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_002_002_0032.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_004_003_0004.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_004_003_0016.smt2
@@ -5270,8 +5360,10 @@ SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_004_004_0008.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_004_004_0016.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_004_004_0032.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_006_002_0004.smt2
+SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_006_003_0008.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_006_004_0004.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_006_006_0004.smt2
+SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_006_006_0016.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_008_002_0004.smt2
 SMT-COMP_2024/bruttomesso/simple_processor/simple_processors_008_003_0008.smt2
 SMT-COMP_2024/calypto/problem_14.smt2
@@ -5280,6 +5372,7 @@ SMT-COMP_2024/calypto/problem_19.smt2
 SMT-COMP_2024/calypto/problem_20.smt2
 SMT-COMP_2024/calypto/problem_24.smt2
 SMT-COMP_2024/calypto/problem_3.smt2
+SMT-COMP_2024/challenge/multiplyOverflow.smt2
 SMT-COMP_2024/ecc/com.galois.ecc.P384ECC64.ec_twin_mul_aux2.short.smt2
 SMT-COMP_2024/ecc/com.galois.ecc.P384ECC64.ec_twin_mul_aux21.short.smt2
 SMT-COMP_2024/ecc/com.galois.ecc.P384ECC64.ec_twin_mul_aux22.short.smt2
@@ -5361,6 +5454,8 @@ SMT-COMP_2024/float/test_v3_r8_vr1_c1_s23752.smt2
 SMT-COMP_2024/float/test_v3_r8_vr1_c1_s733.smt2
 SMT-COMP_2024/float/test_v5_r10_vr1_c1_s19145.smt2
 SMT-COMP_2024/float/test_v5_r15_vr10_c1_s11127.smt2
+SMT-COMP_2024/float/test_v5_r15_vr1_c1_s32559.smt2
+SMT-COMP_2024/float/test_v5_r15_vr1_c1_s8236.smt2
 SMT-COMP_2024/float/test_v5_r5_vr10_c1_s5379.smt2
 SMT-COMP_2024/float/test_v5_r5_vr10_c1_s5996.smt2
 SMT-COMP_2024/float/test_v5_r5_vr1_c1_s14623.smt2
@@ -5368,6 +5463,10 @@ SMT-COMP_2024/float/test_v5_r5_vr1_c1_s15604.smt2
 SMT-COMP_2024/float/test_v5_r5_vr1_c1_s16138.smt2
 SMT-COMP_2024/float/test_v5_r5_vr5_c1_s24018.smt2
 SMT-COMP_2024/float/test_v5_r5_vr5_c1_s9855.smt2
+SMT-COMP_2024/float/test_v7_r12_vr5_c1_s14336.smt2
+SMT-COMP_2024/float/test_v7_r12_vr5_c1_s29826.smt2
+SMT-COMP_2024/float/test_v7_r12_vr5_c1_s8938.smt2
+SMT-COMP_2024/float/test_v7_r7_vr10_c1_s10625.smt2
 SMT-COMP_2024/float/test_v7_r7_vr5_c1_s14675.smt2
 SMT-COMP_2024/float/test_v7_r7_vr5_c1_s3582.smt2
 SMT-COMP_2024/gulwani-pldi08/mccarthy91.phx.smt2
@@ -5392,6 +5491,9 @@ SMT-COMP_2024/log-slicing/bvashr_0342.smt2
 SMT-COMP_2024/log-slicing/bvashr_0480.smt2
 SMT-COMP_2024/log-slicing/bvashr_0503.smt2
 SMT-COMP_2024/log-slicing/bvashr_0526.smt2
+SMT-COMP_2024/log-slicing/bvashr_0641.smt2
+SMT-COMP_2024/log-slicing/bvashr_0664.smt2
+SMT-COMP_2024/log-slicing/bvashr_0687.smt2
 SMT-COMP_2024/log-slicing/bvlshr_0400.smt2
 SMT-COMP_2024/log-slicing/bvlshr_0588.smt2
 SMT-COMP_2024/log-slicing/bvlshr_0635.smt2
@@ -5404,9 +5506,15 @@ SMT-COMP_2024/log-slicing/bvshl_0400.smt2
 SMT-COMP_2024/log-slicing/bvshl_0506.smt2
 SMT-COMP_2024/log-slicing/bvshl_0559.smt2
 SMT-COMP_2024/log-slicing/bvshl_0665.smt2
+SMT-COMP_2024/log-slicing/bvshl_0771.smt2
+SMT-COMP_2024/log-slicing/bvshl_0824.smt2
+SMT-COMP_2024/log-slicing/bvshl_0877.smt2
+SMT-COMP_2024/log-slicing/bvshl_0983.smt2
 SMT-COMP_2024/log-slicing/bvslt_10201.smt2
 SMT-COMP_2024/log-slicing/bvslt_10944.smt2
+SMT-COMP_2024/log-slicing/bvslt_13916.smt2
 SMT-COMP_2024/log-slicing/bvslt_15402.smt2
+SMT-COMP_2024/log-slicing/bvslt_19860.smt2
 SMT-COMP_2024/log-slicing/bvslt_5000.smt2
 SMT-COMP_2024/log-slicing/bvslt_8715.smt2
 SMT-COMP_2024/log-slicing/bvsmod_12.smt2
@@ -5418,14 +5526,19 @@ SMT-COMP_2024/log-slicing/bvudiv_15.smt2
 SMT-COMP_2024/log-slicing/bvult_11982.smt2
 SMT-COMP_2024/log-slicing/bvult_12979.smt2
 SMT-COMP_2024/log-slicing/bvult_13976.smt2
+SMT-COMP_2024/log-slicing/bvult_14973.smt2
+SMT-COMP_2024/log-slicing/bvult_19958.smt2
 SMT-COMP_2024/log-slicing/bvult_6000.smt2
 SMT-COMP_2024/log-slicing/bvult_6997.smt2
 SMT-COMP_2024/log-slicing/bvult_8991.smt2
 SMT-COMP_2024/log-slicing/bvurem_13.smt2
+SMT-COMP_2024/log-slicing/bvurem_15.smt2
 SMT-COMP_2024/mcm/01.smt2
+SMT-COMP_2024/mcm/02.smt2
 SMT-COMP_2024/mcm/03.smt2
 SMT-COMP_2024/mcm/06.smt2
 SMT-COMP_2024/mcm/09.smt2
+SMT-COMP_2024/mcm/101.smt2
 SMT-COMP_2024/mcm/107.smt2
 SMT-COMP_2024/mcm/109.smt2
 SMT-COMP_2024/mcm/117.smt2
@@ -5437,15 +5550,20 @@ SMT-COMP_2024/mcm/156.smt2
 SMT-COMP_2024/mcm/167.smt2
 SMT-COMP_2024/mcm/170.smt2
 SMT-COMP_2024/mcm/177.smt2
+SMT-COMP_2024/mcm/24.smt2
+SMT-COMP_2024/mcm/30.smt2
 SMT-COMP_2024/mcm/33.smt2
 SMT-COMP_2024/mcm/34.smt2
 SMT-COMP_2024/mcm/36.smt2
+SMT-COMP_2024/mcm/38.smt2
 SMT-COMP_2024/mcm/42.smt2
 SMT-COMP_2024/mcm/43.smt2
 SMT-COMP_2024/mcm/44.smt2
 SMT-COMP_2024/mcm/45.smt2
 SMT-COMP_2024/mcm/84.smt2
+SMT-COMP_2024/mcm/85.smt2
 SMT-COMP_2024/mcm/87.smt2
+SMT-COMP_2024/mcm/99.smt2
 SMT-COMP_2024/pspace/ndist.a.20000.smt2
 SMT-COMP_2024/pspace/ndist.a.20998.smt2
 SMT-COMP_2024/pspace/ndist.a.22495.smt2
@@ -5456,6 +5574,9 @@ SMT-COMP_2024/pspace/ndist.a.24990.smt2
 SMT-COMP_2024/pspace/ndist.a.25489.smt2
 SMT-COMP_2024/pspace/ndist.a.26487.smt2
 SMT-COMP_2024/pspace/ndist.a.26986.smt2
+SMT-COMP_2024/pspace/ndist.a.27485.smt2
+SMT-COMP_2024/pspace/ndist.a.28483.smt2
+SMT-COMP_2024/pspace/ndist.a.29481.smt2
 SMT-COMP_2024/pspace/ndist.b.20000.smt2
 SMT-COMP_2024/pspace/ndist.b.20998.smt2
 SMT-COMP_2024/pspace/ndist.b.21497.smt2
@@ -8911,6 +9032,7 @@ SMT-COMP_2024/uclid/tcas/tcas45_k_0.smt2
 SMT-COMP_2024/uclid_contrib_smtcomp09/btfnt_bv_formula.smt2
 SMT-COMP_2024/uclid_contrib_smtcomp09/full_bv_formula.smt2
 SMT-COMP_2024/uclid_contrib_smtcomp09/lf_bv_formula.smt2
+SMT-COMP_2024/uclid_contrib_smtcomp09/stall_bv_formula.smt2
 SMT-COMP_2024/uclid_contrib_smtcomp09/std_bv_formula.smt2
 SMT-COMP_2024/uum/uum8.smt2
 SMT-COMP_2024/wienand-cav2008/Booth/mult_ub_8x8_1.sf.smt2

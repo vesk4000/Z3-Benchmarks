@@ -9,10 +9,15 @@ from pathlib import Path
 import csv
 from Orange.evaluation import compute_CD, graph_ranks
 
-INPUT = Path("results/results.2025-06-09_08-27-08.table.csv")
-OUTPUT = Path("../visualizations/")
+RESULTS_FOLDER = Path("results/")
+INPUT = "20250612_144947_vlsat3_a"
+#INPUT = "20250612_144947_vlsat3_g"
+#INPUT = "20250612_140513_smart_contracts"
+#INPUT = "20250612_142520_smt-comp_2024"
+#INPUT = "20250615_170652_parallel-hyperparameter-search"
+OUTPUT = Path("../Writing/visualizations/")
 
-def parse_results(filepath: Path):
+def parse_results_csv(filepath: Path):
     """
     Parse BenchExec CSV table: three-row multi-index header.
     Returns dict of configs -> {filename: {'status', 'wall_time'}}
@@ -41,19 +46,139 @@ def parse_results(filepath: Path):
             data[config][fname] = {'status': status, 'wall_time': wall}
     return data
 
+def parse_results_benchy(input_directory: Path):
+    """
+    Parse results from folder structure with .err files containing timing info.
+    Returns dict of configs -> {filename: {'status', 'wall_time'}}
+    """
+    import re
+    import glob
+    
+    data = {}
+    
+    # Find all .err files recursively in the input directory
+    err_files = list(input_directory.rglob("*.err"))
+    
+    for err_file in err_files:
+        # Parse filename to extract test name and solver config
+        # Format: {test_file}_{solver_config}.err
+        filename = err_file.stem  # Remove .err extension
+        
+        # Find the last underscore to split test file from solver config
+        # This handles cases where test files might have underscores in their names
+        parts = filename.split('_')
+        if len(parts) < 2:
+            continue  # Skip malformed filenames
+        
+        # Find where the solver config starts (look for z3- pattern)
+        solver_start_idx = None
+        for i, part in enumerate(parts):
+            if part.endswith('.smt2'):
+                solver_start_idx = i + 1
+                break
+        
+        if solver_start_idx is None:
+            continue  # Skip if no z3 config found
+        
+        test_file = '_'.join(parts[:solver_start_idx])
+        solver_config = '_'.join(parts[solver_start_idx:])
+        
+        # Initialize solver config in data if not present
+        if solver_config not in data:
+            data[solver_config] = {}
+        
+        # Read and parse the .err file content
+        try:
+            with open(err_file, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            # Check for timeout patterns
+            if 'CANCELLED AT' in content and 'DUE TO TIME LIMIT' in content:
+                status = 'TIMEOUT'
+                wall_time = np.nan
+            elif 'srun: error:' in content and 'Terminated' in content:
+                status = 'TIMEOUT'  
+                wall_time = np.nan
+            elif 'Job step aborted' in content:
+                status = 'TIMEOUT'
+                wall_time = np.nan
+            elif 'srun: Force Terminated' in content:
+                status = 'TIMEOUT'
+                wall_time = np.nan
+            else:
+                # Look for timing information from the time command
+                # Pattern: "Elapsed (wall clock) time (h:mm:ss or m:ss): X:XX.XX"
+                time_match = re.search(r'Elapsed.*?(?:(\d+):)?(\d+):(\d+\.\d+)', content)
+                if time_match:
+                    # Parse the time components
+                    hours = time_match.group(1)
+                    minutes = int(time_match.group(2))
+                    seconds = float(time_match.group(3))
+                    
+                    if hours:
+                        hours = int(hours)
+                        wall_time = hours * 3600 + minutes * 60 + seconds
+                    else:
+                        wall_time = minutes * 60 + seconds
+                    
+                    # Check exit status
+                    exit_match = re.search(r'Exit status:\s*(\d+)', content)
+                    if exit_match and exit_match.group(1) == '0':
+                        status = 'SUCCESS'
+                    else:
+                        status = 'ERROR'
+                else:
+                    # No timing info found, might be an error
+                    status = 'ERROR'
+                    wall_time = np.nan
+        
+        except Exception as e:
+            # Handle file reading errors
+            status = 'ERROR'
+            wall_time = np.nan
+        
+        # Store the result
+        data[solver_config][test_file] = {
+            'status': status,
+            'wall_time': wall_time
+        }
+    
+    return data
+
 def plot_quantile(data, outdir):
-    plt.figure()
+    plt.figure(figsize=(10, 6))
     for cfg, results in data.items():
-        times = sorted([v['wall_time'] for v in results.values() if v['status'] != 'TIMEOUT'])
+        # Only include successful runs, exclude timeouts and errors
+        times = [v['wall_time'] for v in results.values() if v['status'] == 'SUCCESS' and not np.isnan(v['wall_time'])]
         if times:
-            xs = np.arange(1, len(times)+1)
-            plt.step(xs, times, where='post', label=cfg)
+            times_sorted = sorted(times)
+            xs = np.arange(1, len(times_sorted)+1)
+            plt.step(xs, times_sorted, where='post', label=cfg, linewidth=2)
+            
+            # Debug: check for any issues around position 35
+            if len(times_sorted) > 35:
+                print(f"DEBUG {cfg}: Position 30-40 times: {times_sorted[29:40]}")
+    
     plt.xlabel('Number of instances solved')
     plt.ylabel('Wall time (s)')
     plt.legend()
-    plt.grid(True)
-    p = os.path.join(outdir, 'quantile.svg')
-    plt.savefig(p, format='svg')
+    plt.grid(True, alpha=0.3)
+    
+    # Y-axis scale options:
+    # plt.yscale('log')  # Full logarithmic
+    plt.yscale('symlog', linthresh=1)  # Symmetric log scale with linear threshold at 1
+    # plt.yscale('linear')  # Linear scale (default)
+    
+    # X-axis scale options (uncomment if desired):
+    # plt.xscale('log')  # Logarithmic x-axis (focuses on early solved problems)
+    # plt.xscale('symlog', linthresh=10)  # Symmetric log x-axis
+    
+    plt.title('Quantile Plot (Cactus Plot)')
+    
+    # Ensure absolute path and overwrite existing file
+    p = os.path.abspath(os.path.join(outdir, 'quantile.svg'))
+    print(f"Saving quantile plot to: {p}")
+    plt.savefig(p, format='svg', bbox_inches='tight')
     plt.close()
 
 def plot_scatter(data, outdir):
@@ -79,12 +204,111 @@ def plot_scatter(data, outdir):
         plt.close()
 
 def plot_critical_difference(data, outdir):
-    """Standalone CD plot: draw once and save without extra windows."""
-    # use our draw_cd helper to render into a single figure
-    fig, ax = plt.subplots(figsize=(8, 4))
-    draw_critical_difference(ax, data)
-    p = os.path.join(outdir, 'critical_difference.svg')
-    fig.savefig(p, format='svg')
+    """Generate critical difference plot using Orange's graph_ranks function."""
+    cfgs = list(data.keys())
+    fns = sorted(set().union(*[set(d.keys()) for d in data.values()]))
+    
+    # Filter out test cases where we have no data at all for any solver
+    valid_fns = []
+    for fn in fns:
+        has_any_data = False
+        for cfg in cfgs:
+            if fn in data[cfg]:
+                has_any_data = True
+                break
+        if has_any_data:
+            valid_fns.append(fn)
+    
+    if len(valid_fns) < 2:
+        print("Not enough valid test cases for critical difference plot")
+        return
+    
+    # Estimate timeout limit from the data (use max successful time + buffer)
+    all_successful_times = []
+    for cfg_data in data.values():
+        for result in cfg_data.values():
+            if result['status'] == 'SUCCESS' and not np.isnan(result['wall_time']):
+                all_successful_times.append(result['wall_time'])
+    
+    if all_successful_times:
+        timeout_penalty = max(all_successful_times) * 1.2  # 20% penalty over max successful time
+    else:
+        timeout_penalty = 3600  # Default 1 hour if no successful runs
+    
+    n = len(valid_fns)
+    mat = np.zeros((len(cfgs), n))
+    
+    for i, cfg in enumerate(cfgs):
+        for j, fn in enumerate(valid_fns):
+            if fn in data[cfg]:
+                result = data[cfg][fn]
+                if result['status'] == 'SUCCESS' and not np.isnan(result['wall_time']):
+                    mat[i, j] = result['wall_time']
+                elif result['status'] == 'TIMEOUT':
+                    mat[i, j] = timeout_penalty
+                else:
+                    # ERROR or invalid data - treat as worse than timeout
+                    mat[i, j] = timeout_penalty * 1.1
+            else:
+                # No data for this test case - treat as worse than timeout
+                mat[i, j] = timeout_penalty * 1.1
+    
+    # Compute ranks for each test case (lower time = better rank)
+    ranks = np.array([pd.Series(mat[:, j]).rank(method='average').values for j in range(n)]).T
+    mean_ranks = np.mean(ranks, axis=1)
+    
+    # Check if we have valid ranks
+    if np.any(np.isnan(mean_ranks)):
+        print("Invalid ranking data for critical difference plot")
+        return
+    
+    # Shorten config names for better display
+    shortened_cfgs = []
+    for cfg in cfgs:
+        # Remove common prefixes and use abbreviations
+        short_name = cfg.replace('z3-', '').replace('-and-', '&').replace('-sequential', '-seq')
+        # Further abbreviations
+        short_name = short_name.replace('bit-blasting', 'bit-blast')
+        short_name = short_name.replace('lazy-bit-blast', 'lazy-bb')
+        short_name = short_name.replace('sls', 'SLS')
+        shortened_cfgs.append(short_name)
+    
+    try:
+        cd = compute_CD(mean_ranks, n, alpha='0.05', test='nemenyi')
+        output_path = os.path.join(outdir, 'critical_difference.svg')
+        
+        # Use Orange's graph_ranks function with adjusted parameters for better layout
+        graph_ranks(mean_ranks, shortened_cfgs, cd=cd, 
+                   width=8,        # Increase width to give more space
+                   textspace=2.5,  # Increase text space for longer names
+                   filename=output_path)
+        print(f"Critical difference plot saved to: {output_path}")
+        print(f"Config name mapping:")
+        for orig, short in zip(cfgs, shortened_cfgs):
+            print(f"  {orig} -> {short}")
+        
+        # Print some statistics about timeout handling
+        timeout_counts = {}
+        error_counts = {}
+        for cfg in cfgs:
+            timeouts = sum(1 for result in data[cfg].values() if result['status'] == 'TIMEOUT')
+            errors = sum(1 for result in data[cfg].values() if result['status'] not in ['SUCCESS', 'TIMEOUT'])
+            timeout_counts[cfg] = timeouts
+            error_counts[cfg] = errors
+        
+        print(f"\nTimeout penalty time used: {timeout_penalty:.2f}s")
+        print("Timeout counts per configuration:")
+        for cfg in cfgs:
+            print(f"  {cfg}: {timeout_counts[cfg]} timeouts, {error_counts[cfg]} errors")
+        
+    except Exception as e:
+        print(f"Error generating critical difference plot: {str(e)}")
+        # If the textspace parameter doesn't work, try without it
+        try:
+            graph_ranks(mean_ranks, shortened_cfgs, cd=cd, width=10, filename=output_path)
+            print(f"Critical difference plot saved (fallback): {output_path}")
+        except Exception as e2:
+            print(f"Fallback also failed: {str(e2)}")
 
 def draw_quantile(ax, data):
     """Draw quantile plot on given axes without showing or saving."""
@@ -116,36 +340,14 @@ def draw_scatter(ax, data, a, b):
     ax.grid(True)
 
 def draw_critical_difference(ax, data):
-    """Render critical-difference diagram into ax via an Agg canvas snapshot."""
-    cfgs = list(data.keys())
-    fns = sorted(set().union(*[set(d.keys()) for d in data.values()]))
-    n = len(fns)
-    mat = np.zeros((len(cfgs), n))
-    all_times = [v['wall_time'] for results in data.values() for v in results.values() if not np.isnan(v['wall_time'])]
-    max_time = max(all_times) if all_times else 0
-    for i, cfg in enumerate(cfgs):
-        for j, fn in enumerate(fns):
-            mat[i, j] = data[cfg][fn]['wall_time'] if fn in data[cfg] and data[cfg][fn]['status'] != 'TIMEOUT' else max_time
-    ranks = np.array([pd.Series(mat[:, j]).rank(method='average').values for j in range(n)]).T
-    mean_ranks = np.mean(ranks, axis=1)
-    cd = compute_CD(mean_ranks, n, alpha='0.05', test='nemenyi')
-    # draw on a temporary Agg canvas
-    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-    import matplotlib.pyplot as _plt
-    tmp_fig = _plt.Figure(figsize=(6, 2), dpi=100)
-    canvas = FigureCanvas(tmp_fig)
-    # ax_tmp = tmp_fig.add_subplot(111)
-    graph_ranks(mean_ranks, cfgs, cd=cd, width=6, filename=os.path.join(OUTPUT, 'critical_difference.svg'))
-
-    # canvas.draw()
-    # # capture as RGB array
-    # w, h = canvas.get_width_height()
-    # # get RGBA buffer and drop alpha channel
-    # arr = np.frombuffer(canvas.buffer_rgba(), dtype=np.uint8)
-    # buf = arr.reshape(h, w, 4)[..., :3]
-    # # display in the target ax
-    # ax.imshow(buf)
-    # ax.axis('off')
+    """Simplified placeholder for critical difference in interactive plots."""
+    # Since Orange's graph_ranks saves directly to file, we can't easily render into axes
+    # For interactive plots, show a message directing to the saved file
+    ax.text(0.5, 0.5, 'Critical Difference plot\nsaved separately as\ncritical_difference.svg', 
+            ha='center', va='center', transform=ax.transAxes, fontsize=12)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis('off')
 
 def interactive_plots(data):
     """Show overview grid of all plots, then allow navigating to full-size zoomed views."""
@@ -205,12 +407,15 @@ def interactive_plots(data):
     plt.show()
 
 def main():
-    os.makedirs(OUTPUT, exist_ok=True)
-    data = parse_results(INPUT)
-    plot_quantile(data, OUTPUT)
-    plot_scatter(data, OUTPUT)
-    #plot_critical_difference(data, OUTPUT)
-    draw_critical_difference(data, data)
+    input_directory = Path(RESULTS_FOLDER) / INPUT
+    output_directory = Path(OUTPUT) / INPUT
+    os.makedirs(output_directory, exist_ok=True)
+
+    data = parse_results_benchy(input_directory)
+    print("Cowabunga")
+    # plot_quantile(data, output_directory)
+    # plot_scatter(data, output_directory)
+    # plot_critical_difference(data, output_directory)
     #interactive_plots(data)
 
 if __name__ == '__main__':

@@ -34,6 +34,166 @@ four_horsemen = [
 	}
 ]
 
+concurrent_horsemen = [
+	{
+		"name": "CDCL_16",
+		"command": ["z3", "sat.threads=16", "-smt2"]
+	},
+	{
+		"name": "LS_16",
+		"command": ["z3", "sat.threads=0", "sat.local_search_threads=16", "-smt2"]
+	},
+	{
+		"name": "DDFW_16",
+		"command": ["z3", "sat.threads=0", "sat.ddfw.threads=16", "-smt2"]
+	},
+	{
+		"name": "PCC_def",
+		"command": ["z3", "parallel.enable=true", "parallel.threads.max=16", "-smt2"]
+	},
+	{
+		"name": "PCC_lowBatch",
+		"command": ["z3", "parallel.enable=true", "parallel.threads.max=16", "parallel.conquer.batch_size=100", "parallel.conquer.delay=10", "-smt2"]
+	},
+	{
+		"name": "PCC_hiBatch",
+		"command": ["z3", "parallel.enable=true", "parallel.threads.max=16", "parallel.conquer.batch_size=1000", "parallel.conquer.delay=10", "-smt2"]
+	},
+	{
+	"name": "PCC_noDelay",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=16", "parallel.conquer.batch_size=100", "parallel.conquer.delay=0", "-smt2"]
+	},
+	{
+	"name": "PCC_hiDelay",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=16", "parallel.conquer.batch_size=100", "parallel.conquer.delay=50", "-smt2"]
+	},
+	{
+	"name": "PCC8_CDCL8",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=8", "sat.threads=8", "-smt2"]
+	},
+	{
+	"name": "PCC8_LS8",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=8", "sat.threads=0", "sat.local_search_threads=8", "-smt2"]
+	},
+	{
+	"name": "PCC8_DDFW8",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=8", "sat.threads=0", "sat.ddfw.threads=8", "-smt2"]
+	},
+	{
+	"name": "PCC4_CDCL12",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=4", "sat.threads=12", "-smt2"]
+	},
+	{
+	"name": "PCC12_CDCL4",
+	"command": ["z3", "parallel.enable=true", "parallel.threads.max=12", "sat.threads=4", "-smt2"]
+	},
+	{
+	"name": "LS8_DDFW8",
+	"command": ["z3", "sat.threads=0", "sat.local_search_threads=8", "sat.ddfw.threads=8", "-smt2"]
+	},
+	{
+	"name": "CDCL8_LS8",
+	"command": ["z3", "sat.threads=8", "sat.local_search_threads=8", "-smt2"]
+	},
+	{
+	"name": "CDCL8_DDFW8",
+	"command": ["z3", "sat.threads=8", "sat.ddfw.threads=8", "-smt2"]
+	},
+	{
+	"name": "CDCL6_LS5_DDFW5",
+	"command": ["z3", "sat.threads=6", "sat.local_search_threads=5", "sat.ddfw.threads=5", "-smt2"]
+	}
+]
+
+
+from typing import List, Dict
+
+def get_z3_parallel_configs(threads: int = 8) -> List[Dict]:
+    """
+    Generate a list of Z3 parallel configurations (each uses exactly `threads` total threads).
+    Returns a list of dicts: {'name': str, 'command': List[str]}
+    """
+    configs = []
+    # 1) Pure modes
+    configs.append({
+        "name": f"CDCL_{threads}",
+        "command": ["z3", f"sat.threads={threads}", "-smt2"]
+    })
+    configs.append({
+        "name": f"LS_{threads}",
+        "command": ["z3", "sat.threads=0", f"sat.local_search_threads={threads}", "-smt2"]
+    })
+    configs.append({
+        "name": f"DDFW_{threads}",
+        "command": ["z3", "sat.threads=0", f"sat.ddfw.threads={threads}", "-smt2"]
+    })
+    configs.append({
+        "name": "PCC_def",
+        "command": ["z3", "parallel.enable=true", f"parallel.threads.max={threads}", "-smt2"]
+    })
+
+    # 2) Pairwise hybrids: split threads evenly
+    half = threads // 2
+    configs.append({
+        "name": f"CDCL{half}_LS{half}",
+        "command": ["z3", f"sat.threads={half}", f"sat.local_search_threads={half}", "-smt2"]
+    })
+    configs.append({
+        "name": f"CDCL{half}_DDFW{half}",
+        "command": ["z3", f"sat.threads={half}", f"sat.ddfw.threads={half}", "-smt2"]
+    })
+    configs.append({
+        "name": f"LS{half}_DDFW{half}",
+        "command": ["z3", "sat.threads=0", f"sat.local_search_threads={half}", f"sat.ddfw.threads={half}", "-smt2"]
+    })
+
+    # 3) Tri-hybrid (majority CDCL)
+    configs.append({
+        "name": f"CDCL{threads-2}_LS1_DDFW1",
+        "command": ["z3", f"sat.threads={threads-2}", "sat.local_search_threads=1", "sat.ddfw.threads=1", "-smt2"]
+    })
+
+    # 4) PCC grid (batch_size x delay x restart)
+    batch_sizes = [50, 100, 200, 500]
+    delays = [0, 5, 10, 20]
+    restarts = [1, 2, 5]
+    for bs in batch_sizes:
+        for d in delays:
+            for r in restarts:
+                name = f"PCC_bs{bs}_d{d}_r{r}"
+                cmd = [
+                    "z3",
+                    "parallel.enable=true",
+                    f"parallel.threads.max={threads}",
+                    f"parallel.conquer.batch_size={bs}",
+                    f"parallel.conquer.delay={d}",
+                    f"parallel.conquer.restart.max={r}",
+                    "-smt2"
+                ]
+                configs.append({"name": name, "command": cmd})
+
+    # 5) PCC + SAT/SLS/DDFW hybrids: split threads.max + sat threads
+    for split in [2, 4, 6]:
+        if split >= threads:
+            continue
+        rem = threads - split
+        configs.append({
+            "name": f"PCC{split}_CDCL{rem}",
+            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", f"sat.threads={rem}", "-smt2"]
+        })
+        configs.append({
+            "name": f"PCC{split}_LS{rem}",
+            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", "sat.threads=0", f"sat.local_search_threads={rem}", "-smt2"]
+        })
+        configs.append({
+            "name": f"PCC{split}_DDFW{rem}",
+            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", "sat.threads=0", f"sat.ddfw.threads={rem}", "-smt2"]
+        })
+
+    return configs
+
+
+
 benches = {
 	"vlsat3_a": {
 		"version": 1,
@@ -67,6 +227,30 @@ benches = {
 		"memory_limit": "12000MB",
 		"threads": 16,
 		"commands": four_horsemen,
+	},
+	"parallel-hyperparameter-search": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:10:00",
+		"memory_limit": "3000MB",
+		"threads": 8,
+		"parallel": 8,
+		"commands": get_z3_parallel_configs(threads=8),
+		"task_list": "SMT-COMP_2024_tasks_all.txt",
+	},
+	"parallel-hyperparameter-search-vlsat": {
+		"version": 1,
+		"glob": "VLSAT3/**/*.smt2",
+		"time_limit": "00:10:00",
+		"memory_limit": "3000MB",
+		"threads": 8,
+		"parallel": 8,
+		"commands": [
+			{
+				"name": "default_parallel",
+				"command": ["z3", "parallel.enable=true", "parallel.threads.max=8", "-smt2"]
+			}
+		],
 	}
 }
 
@@ -94,7 +278,7 @@ def run_task(task_command_pair: tuple[Path, tuple[str, list[str]]]):
 	
 	final_cmd = timing_command
 	if SRUN:
-		final_cmd = ["srun", "--exact", "--nodes=1", "--ntasks=1", f"--cpus-per-task={PARALLEL}", f"--mem-per-cpu={MEMORY_LIMIT}", f"--time={TIME_LIMIT}"]
+		final_cmd = ["srun", "--exact", "--nodes=1", "--ntasks=1", f"--cpus-per-task={PARALLEL}", f"--mem-per-cpu={MEMORY_LIMIT}", f"--time={TIME_LIMIT}", "--cpu-bind=cores"]
 		final_cmd.extend(timing_command)
 	
 	print("Starting: " + datetime.now().strftime("%Y%m%d_%H%M%S") + " " + str(relative_path) + " with command: " + command_name)
@@ -122,7 +306,7 @@ def main():
 	MEMORY_LIMIT = benches[args.name]["memory_limit"] if args.memory_limit == "DEFAULT" else args.memory_limit
 	GLOB = benches[args.name]["glob"] if args.glob == "DEFAULT" else args.glob
 	MAX_PARALLEL = benches[args.name]["threads"] if args.threads == -1 else args.threads
-	PARALLEL = args.parallel
+	PARALLEL = benches[args.name]["parallel"] if "parallel" in benches[args.name] else args.parallel
 	task_list = benches[args.name].get("task_list", "DEFAULT") if args.task_list == "DEFAULT" else args.task_list
 
 	SRUN = args.no_srun

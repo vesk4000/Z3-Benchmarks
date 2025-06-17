@@ -28,7 +28,8 @@ def main():
 			seen.add(key)
 			# convert Decimal times to float
 
-			if entry.get("solver") == "Z3-alpha" and entry.get("result") != "Timeout" and entry.get("wallclock_time", 5000.0) < 60.0:
+			# 
+			if entry.get("solver") == "Z3-alpha" and entry.get("result") != "Timeout" and entry.get("wallclock_time", 5000.0) < 6000.0:
 				test_groups[key]["results"].append(entry.get("result", ""))
 				test_groups[key]["times"].append(float(entry.get("wallclock_time", 0.0)))
 				test_groups[key]["memory"] = float(entry.get("memory_usage", 0.0))
@@ -100,17 +101,17 @@ def main():
 	#print(f"Average memory usage: {avg_memory:.6f} MB")
 	print(f"Sum of minimum times: {sum_min:.6f}")
 	print(f"Sum of average times: {sum_avg:.6f}")
-	print(f"Estimated time: {sum_avg / 3600 / 32 * 4 * 4:.2f} hours")
+	print(f"Estimated time: {sum_avg / 3600 / 64 * 4 / 2:.2f} hours")
 	print(f"Number of tests unsolved by any solver (all timed out): {unsolved_count}")
 	total_tests = len(test_groups)
 	print(f"Total QF_BV tests: {total_tests}")
 	print(f"Number of tests solved by at least one solver: {total_tests - unsolved_count}")
 	
 	# Write all task paths to a file
-	with open("SMT-COMP_2024_tasks.txt", "w") as f:
+	with open("SMT-COMP_2024_tasks_all.txt", "w") as f:
 		for key in sorted(actual_tasks_to_run):
 			f.write(f"SMT-COMP_2024/{key}\n")
-	print(f"Written {len(actual_tasks_to_run)} task paths to SMT-COMP_2024_tasks.txt")
+	print(f"Written {len(actual_tasks_to_run)} task paths to SMT-COMP_2024_tasks_all.txt")
 
 if __name__ == "__main__":
 	main()

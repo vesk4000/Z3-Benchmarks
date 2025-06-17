@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=smt-comp_2024
-#SBATCH --partition=compute-p1
-#SBATCH --ntasks=64
-#SBATCH --cpus-per-task=1
+#SBATCH --job-name=slurm-parallel-hyperparameter-search
+#SBATCH --partition=compute-p2
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=3200MB
 #SBATCH --time=03:55:00
 #SBATCH --output=logs/%x-%j.out
@@ -14,4 +14,4 @@ module load miniconda3
 conda activate new-conda-env
 cd /scratch/vmitev/Benchmarking
 
-python3 benchy.py --name smt-comp_2024
+python3 benchy.py --name parallel-hyperparameter-search
