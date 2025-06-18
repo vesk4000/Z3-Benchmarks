@@ -205,6 +205,8 @@ def plot_scatter(data, outdir):
 
 def plot_critical_difference(data, outdir):
     """Generate critical difference plot using Orange's graph_ranks function."""
+    from scipy.stats import friedmanchisquare
+    
     cfgs = list(data.keys())
     fns = sorted(set().union(*[set(d.keys()) for d in data.values()]))
     
@@ -262,6 +264,48 @@ def plot_critical_difference(data, outdir):
         print("Invalid ranking data for critical difference plot")
         return
     
+    print("=== FRIEDMAN TEST ===")
+    print(f"Testing {len(cfgs)} solvers on {n} test cases")
+    
+    # Perform Friedman test
+    # Each row in ranks.T corresponds to ranks for one test case across all solvers
+    try:
+        # Prepare data for Friedman test (each argument is the ranks for one solver across all test cases)
+        solver_ranks = [ranks[i, :] for i in range(len(cfgs))]
+        
+        friedman_stat, friedman_p = friedmanchisquare(*solver_ranks)
+        
+        print(f"Friedman chi-square statistic: {friedman_stat:.4f}")
+        print(f"p-value: {friedman_p:.6f}")
+        print(f"Degrees of freedom: {len(cfgs) - 1}")
+        
+        alpha = 0.05
+        if friedman_p < alpha:
+            print(f"✓ SIGNIFICANT: p < {alpha}, rejecting null hypothesis")
+            print("  There are significant differences between solvers")
+            print("  → Proceeding with post-hoc critical difference analysis")
+            proceed_with_cd = True
+        else:
+            print(f"✗ NOT SIGNIFICANT: p ≥ {alpha}, failing to reject null hypothesis")
+            print("  No significant differences detected between solvers")
+            print("  → Skipping critical difference plot (not statistically justified)")
+            proceed_with_cd = False
+            
+        # Print mean ranks for interpretation
+        print(f"\nMean ranks (lower = better):")
+        for i, cfg in enumerate(cfgs):
+            print(f"  {cfg}: {mean_ranks[i]:.2f}")
+            
+    except Exception as e:
+        print(f"Error performing Friedman test: {str(e)}")
+        print("Proceeding with critical difference plot anyway...")
+        proceed_with_cd = True
+    
+    if not proceed_with_cd:
+        return
+    
+    print(f"\n=== CRITICAL DIFFERENCE ANALYSIS ===")
+    
     # Shorten config names for better display
     shortened_cfgs = []
     for cfg in cfgs:
@@ -276,6 +320,9 @@ def plot_critical_difference(data, outdir):
     try:
         cd = compute_CD(mean_ranks, n, alpha='0.05', test='nemenyi')
         output_path = os.path.join(outdir, 'critical_difference.svg')
+        
+        print(f"Critical difference threshold: {cd:.4f}")
+        print("Pairs with |mean_rank_diff| > CD are significantly different")
         
         # Use Orange's graph_ranks function with adjusted parameters for better layout
         graph_ranks(mean_ranks, shortened_cfgs, cd=cd, 
@@ -412,10 +459,9 @@ def main():
     os.makedirs(output_directory, exist_ok=True)
 
     data = parse_results_benchy(input_directory)
-    print("Cowabunga")
-    # plot_quantile(data, output_directory)
-    # plot_scatter(data, output_directory)
-    # plot_critical_difference(data, output_directory)
+    plot_quantile(data, output_directory)
+    plot_scatter(data, output_directory)
+    plot_critical_difference(data, output_directory)
     #interactive_plots(data)
 
 if __name__ == '__main__':
