@@ -2,6 +2,7 @@
 datasets/
 results/
 benchmarks/
+logs/
 
 # Python cache
 __pycache__/
@@ -20,3 +21,5 @@ my-conda-env
 .conda
 
 tmp
+
+*.sif

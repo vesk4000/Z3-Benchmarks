@@ -105,93 +105,345 @@ concurrent_horsemen = [
 	}
 ]
 
+def make_best_parallel(num_parallel: int):
+	return [
+		{
+			"name": "z3-parallel",
+			"command": [
+				"z3",
+				f"sat.max_memory=2900",
+				"parallel.enable=true",
+				f"parallel.threads.max={num_parallel}",
+				f"parallel.conquer.batch_size=50",
+				f"parallel.conquer.delay=0",
+				f"parallel.conquer.restart.max=10",
+				"parallel.conquer.backtrack_frequency=1",
+			],
+		}
+	]
 
 from typing import List, Dict
 
-def get_z3_parallel_configs(threads: int = 8) -> List[Dict]:
-    """
-    Generate a list of Z3 parallel configurations (each uses exactly `threads` total threads).
-    Returns a list of dicts: {'name': str, 'command': List[str]}
-    """
-    configs = []
-    # 1) Pure modes
-    configs.append({
-        "name": f"CDCL_{threads}",
-        "command": ["z3", f"sat.threads={threads}", "-smt2"]
-    })
-    configs.append({
-        "name": f"LS_{threads}",
-        "command": ["z3", "sat.threads=0", f"sat.local_search_threads={threads}", "-smt2"]
-    })
-    configs.append({
-        "name": f"DDFW_{threads}",
-        "command": ["z3", "sat.threads=0", f"sat.ddfw.threads={threads}", "-smt2"]
-    })
-    configs.append({
-        "name": "PCC_def",
-        "command": ["z3", "parallel.enable=true", f"parallel.threads.max={threads}", "-smt2"]
-    })
+def get_z3_parallel_configs(threads: int = 8, num_random_configs: int = 30) -> List[Dict]:
+	"""
+	Generate a list of Z3 parallel configurations with random search.
+	
+	Parameters:
+	- threads: int - Number of threads for each configuration
+	- num_random_configs: int - Number of random configurations to generate
+	
+	Returns a list of dicts: {'name': str, 'command': List[str]}
+	"""
+	configs = []
+	
+	# Memory limits (using a bit less than 3000MB to be safe)
+	mem_limit = 2900
+	mem_params = [f"sat.max_memory={mem_limit}"]
+	sls_mem_param = f"sls.max_memory={mem_limit}"  # Corrected parameter name
+	
+	# 1) Pure modes (always included)
+	configs.append({
+		"name": f"CDCL_{threads}",
+		"command": ["z3", f"sat.threads={threads}", mem_params[0], "-smt2"]
+	})
+	configs.append({
+		"name": f"LS_{threads}",
+		"command": ["z3", "sat.threads=0", f"sat.local_search_threads={threads}", mem_params[0], "-smt2"]
+	})
+	configs.append({
+		"name": f"DDFW_{threads}",
+		"command": ["z3", "sat.threads=0", f"sat.ddfw.threads={threads}", mem_params[0], "-smt2"]
+	})
+	configs.append({
+		"name": f"SLS_{threads}",
+		"command": ["z3", "smt.sls.enable=true", mem_params[0], sls_mem_param, "-smt2"]
+	})
+	configs.append({
+		"name": "PCC_def",
+		"command": ["z3", "parallel.enable=true", f"parallel.threads.max={threads}", mem_params[0], "-smt2"]
+	})
+	
+	# Parameter ranges for random search
+	param_ranges = {
+		"batch_sizes": [50, 100, 200, 500, 1000, 2000],
+		"delays": [0, 5, 10, 20, 50, 100, 500],
+		"restarts": [1, 2, 5, 10, 25, 50],
+	}
+	
+	# Generate random configurations
+	for _ in range(num_random_configs):
+		# Randomly choose configuration type
+		config_type = random.choice([
+			"hybrid_pair",        # Two techniques combined
+			"hybrid_triple",      # Three techniques combined
+			"pcc_with_params",    # PCC with random params
+			"pcc_hybrid"          # PCC combined with another technique
+		])
+		
+		if config_type == "hybrid_pair":
+			# Randomly select two techniques and distribute threads between them
+			techniques = random.sample(["CDCL", "LS", "DDFW", "SLS"], 2)
+			split = random.randint(1, threads-1)
+			remaining = threads - split
+			
+			cmd = ["z3"]
+			name_parts = []
+			has_sls = False
+			
+			for i, technique in enumerate(techniques):
+				t_threads = split if i == 0 else remaining
+				
+				if technique == "CDCL":
+					cmd.append(f"sat.threads={t_threads}")
+					name_parts.append(f"CDCL{t_threads}")
+				elif technique == "LS":
+					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
+						cmd.append("sat.threads=0")
+					cmd.append(f"sat.local_search_threads={t_threads}")
+					name_parts.append(f"LS{t_threads}")
+				elif technique == "DDFW":
+					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
+						cmd.append("sat.threads=0")
+					cmd.append(f"sat.ddfw.threads={t_threads}")
+					name_parts.append(f"DDFW{t_threads}")
+				elif technique == "SLS":
+					cmd.append("smt.sls.enable=true")
+					name_parts.append(f"SLS{t_threads}")
+					has_sls = True
+			
+			# Add memory limits
+			cmd.append(mem_params[0])
+			if has_sls:
+				cmd.append(sls_mem_param)
+			cmd.append("-smt2")
+			configs.append({
+				"name": "_".join(name_parts),
+				"command": cmd
+			})
+			
+		elif config_type == "hybrid_triple":
+			# Randomly distribute threads among three techniques
+			techniques = random.sample(["CDCL", "LS", "DDFW", "SLS"], 3)
+			
+			# Distribute threads among techniques
+			t1_threads = random.randint(1, threads-2)
+			t2_threads = random.randint(1, threads-t1_threads-1)
+			t3_threads = threads - t1_threads - t2_threads
+			
+			thread_counts = [t1_threads, t2_threads, t3_threads]
+			random.shuffle(thread_counts)  # Randomly assign thread counts to techniques
+			
+			cmd = ["z3"]
+			name_parts = []
+			has_sls = False
+			
+			for i, technique in enumerate(techniques):
+				t_threads = thread_counts[i]
+				
+				if technique == "CDCL":
+					cmd.append(f"sat.threads={t_threads}")
+					name_parts.append(f"CDCL{t_threads}")
+				elif technique == "LS":
+					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
+						cmd.append("sat.threads=0")
+					cmd.append(f"sat.local_search_threads={t_threads}")
+					name_parts.append(f"LS{t_threads}")
+				elif technique == "DDFW":
+					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
+						cmd.append("sat.threads=0")
+					cmd.append(f"sat.ddfw.threads={t_threads}")
+					name_parts.append(f"DDFW{t_threads}")
+				elif technique == "SLS":
+					cmd.append("smt.sls.enable=true")
+					name_parts.append(f"SLS{t_threads}")
+					has_sls = True
+			
+			# Add memory limits
+			cmd.append(mem_params[0])
+			if has_sls:
+				cmd.append(sls_mem_param)
+			cmd.append("-smt2")
+			configs.append({
+				"name": "_".join(name_parts),
+				"command": cmd
+			})
+			
+		elif config_type == "pcc_with_params":
+			# PCC with random parameter settings
+			bs = random.choice(param_ranges["batch_sizes"])
+			d = random.choice(param_ranges["delays"])
+			r = random.choice(param_ranges["restarts"])
+			
+			cmd = [
+				"z3",
+				"parallel.enable=true",
+				f"parallel.threads.max={threads}",
+				f"parallel.conquer.batch_size={bs}",
+				f"parallel.conquer.delay={d}",
+				f"parallel.conquer.restart.max={r}",
+				mem_params[0],
+				"-smt2"
+			]
+			
+			configs.append({
+				"name": f"PCC_bs{bs}_d{d}_r{r}",
+				"command": cmd
+			})
+			
+		elif config_type == "pcc_hybrid":
+			# PCC combined with another technique
+			pcc_threads = random.randint(1, threads-1)
+			other_threads = threads - pcc_threads
+			
+			technique = random.choice(["CDCL", "LS", "DDFW", "SLS"])
+			
+			bs = random.choice(param_ranges["batch_sizes"])
+			d = random.choice(param_ranges["delays"])
+			r = random.choice(param_ranges["restarts"])
+			
+			cmd = [
+				"z3",
+				"parallel.enable=true",
+				f"parallel.threads.max={pcc_threads}",
+				f"parallel.conquer.batch_size={bs}",
+				f"parallel.conquer.delay={d}",
+				f"parallel.conquer.restart.max={r}",
+			]
+			
+			name = f"PCC{pcc_threads}_bs{bs}_d{d}_r{r}"
+			has_sls = False
+			
+			if technique == "CDCL":
+				cmd.append(f"sat.threads={other_threads}")
+				name += f"_CDCL{other_threads}"
+			elif technique == "LS":
+				cmd.append("sat.threads=0")
+				cmd.append(f"sat.local_search_threads={other_threads}")
+				name += f"_LS{other_threads}"
+			elif technique == "DDFW":
+				cmd.append("sat.threads=0")
+				cmd.append(f"sat.ddfw.threads={other_threads}")
+				name += f"_DDFW{other_threads}"
+			elif technique == "SLS":
+				cmd.append("smt.sls.enable=true")
+				name += f"_SLS{other_threads}"
+				has_sls = True
+			
+			# Add memory limits
+			cmd.append(mem_params[0])
+			if has_sls:
+				cmd.append(sls_mem_param)
+			cmd.append("-smt2")
+			configs.append({
+				"name": name,
+				"command": cmd
+			})
+	
+	return configs
 
-    # 2) Pairwise hybrids: split threads evenly
-    half = threads // 2
-    configs.append({
-        "name": f"CDCL{half}_LS{half}",
-        "command": ["z3", f"sat.threads={half}", f"sat.local_search_threads={half}", "-smt2"]
-    })
-    configs.append({
-        "name": f"CDCL{half}_DDFW{half}",
-        "command": ["z3", f"sat.threads={half}", f"sat.ddfw.threads={half}", "-smt2"]
-    })
-    configs.append({
-        "name": f"LS{half}_DDFW{half}",
-        "command": ["z3", "sat.threads=0", f"sat.local_search_threads={half}", f"sat.ddfw.threads={half}", "-smt2"]
-    })
 
-    # 3) Tri-hybrid (majority CDCL)
-    configs.append({
-        "name": f"CDCL{threads-2}_LS1_DDFW1",
-        "command": ["z3", f"sat.threads={threads-2}", "sat.local_search_threads=1", "sat.ddfw.threads=1", "-smt2"]
-    })
+def get_z3_parallel_configs3(threads: int = 8, num_random_configs: int = 30) -> List[Dict]:
+	"""
+	Generate a list of Z3 parallel configurations with random search.
+	
+	Parameters:
+	- threads: int - Number of threads for each configuration
+	- num_random_configs: int - Number of random configurations to generate
+	
+	Returns a list of dicts: {'name': str, 'command': List[str]}
+	"""
+	random.seed(42)
+	
+	configs = []
+	
+	# Memory limits (using a bit less than 3000MB to be safe)
+	mem_limit = 2900
+	
+	# Parameter ranges for random search
+	param_ranges = {
+		"batch_sizes": [50, 100, 200, 500, 1000, 2000],
+		"delays": [0, 5, 10, 20, 50, 100, 500],
+		"restarts": [1, 2, 5, 10, 25, 50],
+		"backtrack_frequency": [1, 5, 10, 50, 100, 1000],
+	}
+	
+	# Generate random configurations
+	for _ in range(num_random_configs):
+		# Randomly choose configuration type
+		config_type = random.choice([
+			"just_one",
+			"hybrid_pair",        # Two techniques combined
+			"hybrid_triple"
+		])
+		techniques = random.choices(["SAT", "CaC"], [1, 20])
+		all_techniques = ["DDFW", "SLS"]
 
-    # 4) PCC grid (batch_size x delay x restart)
-    batch_sizes = [50, 100, 200, 500]
-    delays = [0, 5, 10, 20]
-    restarts = [1, 2, 5]
-    for bs in batch_sizes:
-        for d in delays:
-            for r in restarts:
-                name = f"PCC_bs{bs}_d{d}_r{r}"
-                cmd = [
-                    "z3",
-                    "parallel.enable=true",
-                    f"parallel.threads.max={threads}",
-                    f"parallel.conquer.batch_size={bs}",
-                    f"parallel.conquer.delay={d}",
-                    f"parallel.conquer.restart.max={r}",
-                    "-smt2"
-                ]
-                configs.append({"name": name, "command": cmd})
+		if config_type == "hybrid_pair":
+			techniques.append(random.choice(all_techniques))
+		if config_type == "hybrid_triple":
+			techniques.extend(all_techniques)
 
-    # 5) PCC + SAT/SLS/DDFW hybrids: split threads.max + sat threads
-    for split in [2, 4, 6]:
-        if split >= threads:
-            continue
-        rem = threads - split
-        configs.append({
-            "name": f"PCC{split}_CDCL{rem}",
-            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", f"sat.threads={rem}", "-smt2"]
-        })
-        configs.append({
-            "name": f"PCC{split}_LS{rem}",
-            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", "sat.threads=0", f"sat.local_search_threads={rem}", "-smt2"]
-        })
-        configs.append({
-            "name": f"PCC{split}_DDFW{rem}",
-            "command": ["z3", "parallel.enable=true", f"parallel.threads.max={split}", "sat.threads=0", f"sat.ddfw.threads={rem}", "-smt2"]
-        })
+		max_threads = threads
+		threads_per_technique = []
+		while True:
+			for i in range(0, len(techniques) - 1):
+				threads_per_technique.append(random.randint(1, max_threads - 1))
+			sum_of_threads_so_far = sum(threads_per_technique)
+			if sum_of_threads_so_far < max_threads:
+				flag_all_ok = True
+				threads_per_technique.append(max_threads - sum_of_threads_so_far)
+				for i in range(len(threads_per_technique)):
+					if techniques[i] == "SAT" or techniques[i] == "CaC":
+						if threads_per_technique[i] < 2:
+							flag_all_ok = False
+				if flag_all_ok:
+					break
+			threads_per_technique = []
 
-    return configs
+		cmd = ["z3"]
+		name_parts = []
 
+		cmd.append(f"sat.max_memory={mem_limit}")
+
+		if "SAT" in techniques:
+			idx = techniques.index("SAT")
+			cmd.append(f"sat.threads={threads_per_technique[idx]}")
+			name_parts.append(f"SAT{threads_per_technique[idx]}")
+		if "SLS" in techniques:
+			idx = techniques.index("SLS")
+			cmd.append("smt.sls.enable=true")
+			cmd.append(f"sat.local_search_threads={threads_per_technique[idx]}")
+			cmd.append(f"smt.sls.parallel=true")
+			cmd.append(f"sls.max_memory={mem_limit}")
+			name_parts.append(f"SLS{threads_per_technique[idx]}")
+		if "DDFW" in techniques:
+			idx = techniques.index("DDFW")
+			cmd.append(f"sat.ddfw.threads={threads_per_technique[idx]}")
+			name_parts.append(f"DDFW{threads_per_technique[idx]}")
+		if "CaC" in techniques:
+			idx = techniques.index("CaC")
+			bs = random.choice(param_ranges["batch_sizes"])
+			d = random.choice(param_ranges["delays"])
+			r = random.choice(param_ranges["restarts"])
+			bf = random.choice(param_ranges["backtrack_frequency"])
+			cmd.append(f"parallel.enable=true")
+			name_parts.append(f"CaC{threads_per_technique[idx]}")
+			cmd.append(f"parallel.threads.max={threads_per_technique[idx]}")
+			cmd.append(f"parallel.conquer.batch_size={bs}")
+			name_parts.append(f"bs{bs}")
+			cmd.append(f"parallel.conquer.delay={d}")
+			name_parts.append(f"d{d}")
+			cmd.append(f"parallel.conquer.restart.max={r}")
+			name_parts.append(f"r{r}")
+			cmd.append(f"parallel.conquer.backtrack_frequency={bf}")
+			name_parts.append(f"bf{bf}")
+			
+		configs.append({
+			"name": "_".join(name_parts),
+			"command": cmd
+		})
+	
+	return configs
 
 
 benches = {
@@ -202,6 +454,15 @@ benches = {
 		"memory_limit": "3000MB",
 		"threads": 31,
 		"commands": four_horsemen,
+	},
+	"vlsat3_a_rest": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:40:00",
+		"memory_limit": "3000MB",
+		"threads": 63,
+		"commands": four_horsemen,
+		"task_list": "VLSAT3a_tasks_rest.txt",
 	},
 	"vlsat3_g": {
 		"version": 1,
@@ -214,11 +475,20 @@ benches = {
 	"smt-comp_2024": {
 		"version": 1,
 		"glob": "COWABUNGA",
-		"time_limit": "00:01:30",
+		"time_limit": "00:20:00",
 		"memory_limit": "3000MB",
 		"threads": 64,
 		"commands": four_horsemen,
-		"task_list": "SMT-COMP_2024_tasks.txt",
+		"task_list": "SMT-COMP_2024_tasks_all.txt",
+	},
+	"smt-comp_2024-electric-boogaloo": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 64,
+		"commands": four_horsemen,
+		"task_list": "SMT-COMP_2024_rest.txt",
 	},
 	"smart_contracts": {
 		"version": 1,
@@ -228,15 +498,105 @@ benches = {
 		"threads": 16,
 		"commands": four_horsemen,
 	},
-	"parallel-hyperparameter-search": {
+	# "parallel-scaling-1": {
+	# 	"version": 1,
+	# 	"glob": "COWABUNGA",
+	# 	"time_limit": "00:20:00",
+	# 	"memory_limit": "3000MB",
+	# 	"threads": 64,
+	# 	"parallel": 1,
+	# 	"commands": make_best_parallel(1),
+	# 	"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	# },
+	"parallel-scaling-2": {
 		"version": 1,
 		"glob": "COWABUNGA",
-		"time_limit": "00:10:00",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 32,
+		"parallel": 2,
+		"commands": make_best_parallel(2),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-scaling-4": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 16,
+		"parallel": 4,
+		"commands": make_best_parallel(4),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-scaling-8": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
 		"memory_limit": "3000MB",
 		"threads": 8,
 		"parallel": 8,
-		"commands": get_z3_parallel_configs(threads=8),
-		"task_list": "SMT-COMP_2024_tasks_all.txt",
+		"commands": make_best_parallel(8),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-scaling-16": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 4,
+		"parallel": 16,
+		"commands": make_best_parallel(16),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-scaling-32": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 2,
+		"parallel": 32,
+		"commands": make_best_parallel(32),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-scaling-64": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:20:00",
+		"memory_limit": "3000MB",
+		"threads": 1,
+		"parallel": 64,
+		"commands": make_best_parallel(64),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-hyperparameter-search": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:04:00",
+		"memory_limit": "3000MB",
+		"threads": 8,
+		"parallel": 8,
+		"commands": get_z3_parallel_configs3(threads=8, num_random_configs=500),
+		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+	},
+	"parallel-hyperparameter-search-2": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:00:30",
+		"memory_limit": "3000MB",
+		"threads": 1,
+		"parallel": 8,
+		"commands": get_z3_parallel_configs(threads=8, num_random_configs=500),
+		"task_list": "SMT-COMP_2024_tasks_one.txt",
+	},
+	"parallel-hyperparameter-search-3": {
+		"version": 1,
+		"glob": "COWABUNGA",
+		"time_limit": "00:03:00",
+		"memory_limit": "3000MB",
+		"threads": 1,
+		"parallel": 8,
+		"commands": get_z3_parallel_configs3(threads=8, num_random_configs=500),
+		"task_list": "SMT-COMP_2024_tasks_one.txt",
 	},
 	"parallel-hyperparameter-search-vlsat": {
 		"version": 1,
@@ -326,6 +686,9 @@ def main():
 	
 	random.seed(42)
 	random.shuffle(task_files)
+
+	print(benches[args.name]["commands"])
+	print(len(benches[args.name]["commands"]))
 
 	task_command_pairs = []
 	for task in task_files:

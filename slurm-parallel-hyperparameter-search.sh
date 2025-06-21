@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=slurm-parallel-hyperparameter-search
 #SBATCH --partition=compute-p2
-#SBATCH --ntasks=4
-#SBATCH --cpus-per-task=16
+#SBATCH --ntasks=8
+#SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=3200MB
-#SBATCH --time=03:55:00
+#SBATCH --time=12:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 #SBATCH --mail-type=BEGIN

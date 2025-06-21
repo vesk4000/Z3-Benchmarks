@@ -43,12 +43,12 @@ RUN git clone https://github.com/Z3Prover/z3.git z3-4.15.1 \
     && rm -rf build .git
 
 # Build Z3 PolySAT
-# RUN git clone https://github.com/Z3Prover/z3.git z3-poly \
-#     && cd z3-poly \
-#     && git checkout 16fb86b636047fd79ad5827f768b6f26d8812948 \
-#     && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-poly/install \
-#     && cd build && make -j"$(nproc)" install \
-#     && rm -rf build .git
+RUN git clone https://github.com/Z3Prover/z3.git z3-poly \
+    && cd z3-poly \
+    && git checkout 16fb86b636047fd79ad5827f768b6f26d8812948 \
+    && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-poly/install \
+    && cd build && make -j"$(nproc)" install \
+    && rm -rf build .git
 
 # Create symlinks for easy access - default to latest
 RUN ln -s /opt/z3-versions/z3-4.15.1/install/bin/z3 /usr/local/bin/z3 \

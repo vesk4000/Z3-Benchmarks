@@ -1,193 +1,221 @@
-# Z3 Benchmarking with BenchExec
+# Z3 Benchmarking on SLURM
 
-This repository contains a Docker-based setup for benchmarking multiple versions of Z3 using BenchExec.
+A comprehensive benchmarking framework for evaluating Z3 solver configurations on SMT-LIB benchmarks using SLURM clusters.
 
-## Features
+## Quick Setup
 
-- **Multiple Z3 versions**: Latest, 4.12.0, and 4.11.2
-- **Proper cgroup setup**: Follows BenchExec container requirements
-- **VS Code dev container**: Easy development environment
-- **Security**: Runs as non-root user inside container
-
-
-## Sync Folders
-```bash
-rsync -av Benchmarking  vmitev@login.delftblue.tudelft.nl:/scratch/vmitev/ --exclude .git
-```
-
-see details about past jobs
-```
-sacct --starttime 2014-07-01 --format=User,JobID,Jobname%50,partition,state,time,start,end,elapsed,MaxRss,MaxVMSize,nnodes,ncpus,nodelist
-```
-
-see useage of nodes:
-```
-sinfo -o "%20P %5D %6t %8c %8z %15C %N"
-```
-
-## 1. Build & Publish the Base Image
-
-1. In your workspace directory (contains Dockerfile):
+1. **Clone and setup environment**:
    ```bash
-   docker build -t vesk4000/z3-benchmarks:v1 DockerfileSLRUM
-   ```
-2. (Optional) Push to Docker Hub or your registry:
-   ```bash
-   docker push vesk4000/z3-benchmarks:v1
+   git clone <your-repo>
+   cd Benchmarking
+   chmod +x init.sh *.sh
+   ./init.sh  # Sets up conda environment and dependencies
    ```
 
-## Quick Start
-
-1. **Open in VS Code Dev Container**:
-   - Open this folder in VS Code
-   - When prompted, click "Reopen in Container" or use Command Palette: "Dev Containers: Reopen in Container"
-   - Wait for the container to build and start
-
-2. **Verify the setup**:
+2. **Download benchmark datasets**:
    ```bash
-   # Check Z3 versions are available
-   z3-latest --version
-   z3-4.12.0 --version
-   z3-4.11.2 --version
+   mkdir -p datasets
    
-   # Check BenchExec is working
-   benchexec --help
+   # QF_BV dataset from Zenodo
+   cd datasets
+   wget -O QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1"
+   tar -I zstd -xf QF_BV.tar.zst
+   rm QF_BV.tar.zst
+   
+   # VLSAT3 dataset from CADP
+   mkdir -p VLSAT3
+   wget -r --no-parent -A "vlsat3*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P VLSAT3
+   find VLSAT3 -name "*.smt2.bz2" -exec bunzip2 {} +
+   
+   # SMT-COMP 2024 dataset (adjust URL/path as needed)
+   # Download from SMT-COMP official sources or your institution's mirror
    ```
 
-## Container Structure
-
-- **Z3 Versions**: Multiple Z3 versions installed in `/opt/z3-versions/`
-  - `z3-latest`: Latest development version
-  - `z3-4.12.0`: Stable release 4.12.0
-  - `z3-4.11.2`: Older stable release 4.11.2
-
-- **Symlinks**: Easy access via `/usr/local/bin/z3-*`
-
-## Directory Structure
-
-```
-/workspace/
-├── benchmarks/     # Your benchmark configurations
-├── datasets/       # SMT problem files
-├── results/        # Benchmark results
-├── z3-*.py        # Tool definitions for different Z3 versions
-└── sample-benchmark.xml  # Example benchmark configuration
-```
-
-## Adding SMT Datasets
-
-1. Create directories under `datasets/` for different SMT-LIB logics:
+3. **Update SLURM configuration** in scripts (partition, account, paths):
    ```bash
-   mkdir -p datasets/QF_LIA datasets/QF_LRA datasets/QF_BV
+   # Edit slurm-*.sh files to match your cluster settings:
+   # - #SBATCH --partition=your-partition
+   # - #SBATCH --account=your-account  
+   # - cd /your/scratch/path/Benchmarking
    ```
 
-2. Add your `.smt2` files to the appropriate directories
+4. **Update dataset paths** in `plot_results.py`:
+   ```python
+   # Edit the DATASETS_FOLDER variable to match your setup:
+   DATASETS_FOLDER = Path("/path/to/your/datasets/")
+   ```
 
-3. The benchmark configuration will automatically pick them up
+## Dataset Requirements
+
+The framework expects datasets in these locations:
+- `datasets/QF_BV/` - SMT-LIB QF_BV benchmarks
+- `datasets/VLSAT3/` - VLSAT3 benchmarks  
+- `datasets/SMT-COMP_2024/` - SMT-COMP 2024 benchmarks
+- `datasets/Smart_Contract_Verification/` - Smart contract benchmarks
+
+**Required tools for dataset extraction:**
+- `zstd` - for QF_BV.tar.zst extraction
+- `bzip2` - for VLSAT3 .bz2 files
+- `wget` - for downloading datasets
+
+Install on Ubuntu/Debian:
+```bash
+sudo apt-get install zstd bzip2 wget
+```
+
+## Available Benchmarks
+
+The framework includes pre-configured benchmark suites:
+
+| Name | Dataset | Configs | Time Limit | Description |
+|------|---------|---------|------------|-------------|
+| `smt-comp_2024` | SMT-COMP 2024 | 4 solver configs | 20 min | Main competition benchmark |
+| `vlsat3_a` | VLSAT3 | 4 solver configs | 40 min | VLSAT3 'a' instances |
+| `vlsat3_g` | VLSAT3 | 4 solver configs | 40 min | VLSAT3 'g' instances |
+| `smart_contracts` | Smart contracts | 4 solver configs | 60 min | Smart contract verification |
+| `parallel-hyperparameter-search` | SMT-COMP 2024 | 500 random configs | 4 min | Hyperparameter optimization |
+| `parallel-scaling-X` | SMT-COMP 2024 | 1 config | 20 min | Scaling analysis (X = 2,4,8,16,32,64 cores) |
 
 ## Running Benchmarks
 
-### Single Tool Execution with runexec
-
-For simple measurements, use `runexec`:
-
+### Standard Benchmarks
 ```bash
-# Test Z3 latest on a single file
-runexec --walltimelimit 60s --memlimit 1GB --cores 0 \
-  --output results/test.log -- z3-latest -smt2 datasets/QF_LIA/example.smt2
-
-# Compare different versions
-runexec --walltimelimit 60s --memlimit 1GB --cores 0 \
-  -- z3-4.12.0 -smt2 datasets/QF_LIA/example.smt2
+# Submit specific benchmark jobs
+sbatch slurm-smt-comp_2024.sh
+sbatch slurm-vlsat3_a.sh
+sbatch slurm-vlsat3_g.sh
+sbatch slurm-smart_contracts.sh
 ```
 
-### Full Benchmark Suite with benchexec
-
-For comprehensive benchmarking:
-
+### Hyperparameter Search
 ```bash
-# Run the multi-version comparison
-benchexec sample-benchmark.xml
-
-# Run with specific number of CPU cores
-benchexec sample-benchmark.xml --numOfThreads 4
-
-# Generate HTML results
-benchexec sample-benchmark.xml --outputpath results/
-table-generator results/sample-benchmark.*.xml.bz2
+sbatch slurm-parallel-hyperparameter-search.sh
 ```
 
-## Customizing Benchmarks
-
-Edit `sample-benchmark.xml` to:
-- Add more Z3 configurations/options
-- Include different SMT logic categories
-- Adjust time/memory limits
-- Add custom result columns
-
-## Tool Definitions
-
-Custom BenchExec tool definitions are provided:
-- `z3-latest.py`: For the latest Z3 version
-- `z3-4.12.0.py`: For Z3 4.12.0
-- `z3-4.11.2.py`: For Z3 4.11.2
-
-These handle result parsing and tool location for BenchExec.
-
-## Container Requirements
-
-This setup requires:
-- Docker with `--privileged` access (for cgroup management)
-- Sufficient memory (4GB+ recommended)
-- Multiple CPU cores for parallel execution
-
-## Troubleshooting
-
-### Container Build Issues
-- If the build fails, try rebuilding with: "Dev Containers: Rebuild Container"
-- Check Docker has enough memory allocated (8GB+ recommended)
-
-### BenchExec Issues
+### Scaling Analysis
 ```bash
-# Check cgroup setup
-python3 -m benchexec.check_cgroups
-
-# Check if Z3 versions are accessible
-which z3-latest z3-4.12.0 z3-4.11.2
+# Run parallel scaling experiments
+sbatch slurm-parallel-scaling-2.sh
+sbatch slurm-parallel-scaling-4.sh
+sbatch slurm-parallel-scaling-8.sh
+sbatch slurm-parallel-scaling-16.sh
+sbatch slurm-parallel-scaling-32.sh
+sbatch slurm-parallel-scaling-64.sh
 ```
 
-### Permission Issues
-If you encounter permission issues:
+### Monitor Jobs
 ```bash
-sudo chown -R benchuser:benchuser /workspace
+squeue -u $USER                    # Check job status
+scancel <job-id>                   # Cancel specific job
+tail -f logs/<job-name>-<id>.out   # Follow job output
 ```
 
-If BenchExec reports cgroup issues, verify the init script ran:
+## Solver Configurations
+
+The framework tests these Z3 configurations:
+
+- **z3-bit-blast**: Bit-blasting with SMT tactic
+- **z3-int-blast**: Integer solver with BV solver=2  
+- **z3-lazy-bit-blast**: Polynomial arithmetic with BV solver=1
+- **z3-sls-and-bit-blasting-sequential**: Stochastic local search (sequential)
+
+For parallel experiments, additional configurations test various thread combinations and parameter settings.
+
+## Analysis & Visualization
+
+1. **Process results** (automatically finds latest results):
+   ```bash
+   python plot_results.py  # Edit INPUT variable for specific dataset
+   ```
+
+2. **Sort hyperparameter results**:
+   ```bash
+   python sort_hyperparameter_results.py results/TIMESTAMP_*/parallel_hyperparameter_search_ranks.txt
+   ```
+
+3. **Generated plots**:
+   - `quantile.svg`: Cactus plot showing solver performance
+   - `scatter_*.svg`: Pairwise solver comparisons  
+   - `critical_difference.svg`: Statistical significance analysis
+   - `histogram_family_binned_performance.svg`: Performance by benchmark family
+
+4. **Critical difference analysis**:
+   ```bash
+   python sort_hyperparameter_results.py ranks.txt --cd-only --instances 30
+   ```
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `benchy.py` | Main benchmarking script with solver configurations |
+| `slurm-*.sh` | SLURM job scripts for different experiments |
+| `plot_results.py` | Visualization and statistical analysis |
+| `sort_hyperparameter_results.py` | Results processing and ranking |
+| `init.sh` | Environment setup script |
+| `*_tasks*.txt` | Task lists for different benchmark subsets |
+
+## Configuration
+
+### Solver Configs (in benchy.py)
+```python
+four_horsemen = [
+    {
+        "name": "z3-bit-blast", 
+        "command": ["z3", "-smt2", "tactic.default_tactic='...'"]
+    },
+    # Add custom configurations here
+]
+```
+
+### SLURM Resources (in slurm-*.sh)
 ```bash
-ls -la /sys/fs/cgroup/benchexec/
+#SBATCH --time=02:00:00      # Adjust time limit
+#SBATCH --mem-per-cpu=3200MB # Adjust memory
+#SBATCH --ntasks=64          # Adjust parallelism
+```
+
+### Dataset Paths (in plot_results.py)
+```python
+DATASETS_FOLDER = Path("D:/datasets/")  # Update to your path
+INPUT = "20250618_214918_parallel-hyperparameter-search"  # Select dataset
+```
+
+## Output Structure
+
+```
+results/
+  TIMESTAMP_experiment-name/
+    dataset/family/instance.smt2_config.{out,err}
+    logs/
+cache/
+  cleaned_data_*.pkl        # Processed results cache
+  smt2_stats_cache.json     # SMT2 file analysis cache
+logs/
+  job-name-id.{out,err}     # SLURM job logs
 ```
 
 ## Advanced Usage
 
-### Adding More Z3 Versions
-1. Modify the Dockerfile to add more versions
-2. Create corresponding tool definition files
-3. Update benchmark configurations
-
-### Custom Z3 Configurations
-Create tool definitions with different command-line options:
-```python
-def cmdline(self, executable, options, task, rlimits):
-    return [executable, "-smt2", "-T:60", "model_validate=true"] + options + [task.single_input_file]
+### Custom Task Lists
+Create text files with instance paths:
+```bash
+echo "SMT-COMP_2024/QF_BV/family/instance.smt2" > custom_tasks.txt
+python benchy.py --name custom --task-list custom_tasks.txt
 ```
 
-### Large-Scale Benchmarking
-- Use BenchExec's parallel execution capabilities
-- Consider resource limits carefully
-- Monitor system load during execution
+### Merging Multiple Runs
+The framework automatically merges results from multiple runs of the same experiment, taking the best result for each instance.
 
-## Resources
+### Memory and Time Limits
+Each benchmark configuration specifies appropriate limits. Smart contracts use higher memory (12GB) and longer timeouts (60min).
 
-- [BenchExec Documentation](https://github.com/sosy-lab/benchexec/blob/main/doc/INDEX.md)
-- [SMT-LIB Benchmarks](https://www.smt-lib.org/)
-- [Z3 Documentation](https://github.com/Z3Prover/z3)
+## Troubleshooting
+
+- **Permission denied**: Run `chmod +x *.sh` to make scripts executable
+- **Module not found**: Check conda environment activation in SLURM scripts
+- **Out of memory**: Reduce `--mem-per-cpu` or increase memory limits in job scripts
+- **Jobs pending**: Check cluster queue status and resource availability
+- **No results**: Verify dataset paths and task file contents
+
+
