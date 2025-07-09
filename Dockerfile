@@ -27,14 +27,6 @@ RUN add-apt-repository ppa:sosy-lab/benchmarking \
 # Create directories for multiple Z3 versions
 RUN mkdir -p /opt/z3-versions
 
-# Build Z3 4.12.0
-# RUN git clone https://github.com/Z3Prover/z3.git z3-4.12.0 \
-#     && cd z3-4.12.0 \
-#     && git checkout z3-4.12.0 \
-#     && python3 scripts/mk_make.py --prefix=/opt/z3-versions/z3-4.12.0/install \
-#     && cd build && make -j"$(nproc)" install \
-#     && rm -rf build .git
-
 # Build Z3 latest (main branch)
 RUN git clone https://github.com/Z3Prover/z3.git z3-4.15.1 \
     && cd z3-4.15.1 \
@@ -52,8 +44,7 @@ RUN git clone https://github.com/Z3Prover/z3.git z3-poly \
 
 # Create symlinks for easy access - default to latest
 RUN ln -s /opt/z3-versions/z3-4.15.1/install/bin/z3 /usr/local/bin/z3 \
-    #&& ln -s /opt/z3-versions/z3-poly/install/bin/z3 /usr/local/bin/z3-poly \ 
-    # && ln -s /opt/z3-versions/z3-4.12.0/install/bin/z3 /usr/local/bin/z3-4.12.0 \
+    && ln -s /opt/z3-versions/z3-poly/install/bin/z3 /usr/local/bin/z3-poly \ 
     && ln -s /opt/z3-versions/z3-4.15.1/install/bin/z3 /usr/local/bin/z3-4.15.1
 
 # Install Python packages that might be useful for benchmarking
@@ -82,16 +73,7 @@ RUN useradd -ms /bin/bash benchuser \
     && echo "benchuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN chown -R benchuser:benchuser /workspace /opt/z3-versions
 
-# # Install small utilities for QF_BV and download the QF_BV dataset
-# RUN mkdir -p /benchmarks/QF_BV && wget -O /benchmarks/QF_BV/QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1" \
-#     && tar -I zstd -xf /benchmarks/QF_BV/QF_BV.tar.zst -C /benchmarks/QF_BV && rm /benchmarks/QF_BV/QF_BV.tar.zst
-
-# # Install bzip2 and download the VLSAT-3 dataset in its own layer
-# RUN mkdir -p /benchmarks/VLSAT3 \
-#     && wget -r --no-parent -A "vlsat3*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P /benchmarks/VLSAT3 \
-#     && find /benchmarks/VLSAT3 -name "*.smt2.bz2" -exec bunzip2 {} +
-
-# Set init.sh as the entrypoint (important to use array format)
+# Set init.sh as the entrypoint
 ENTRYPOINT ["/init.sh"]
 
 # Default command

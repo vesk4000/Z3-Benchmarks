@@ -5,6 +5,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 import argparse
+from typing import List, Dict
 
 # Configuration
 TASK_DIR = Path("./datasets/")
@@ -122,227 +123,8 @@ def make_best_parallel(num_parallel: int):
 		}
 	]
 
-from typing import List, Dict
 
 def get_z3_parallel_configs(threads: int = 8, num_random_configs: int = 30) -> List[Dict]:
-	"""
-	Generate a list of Z3 parallel configurations with random search.
-	
-	Parameters:
-	- threads: int - Number of threads for each configuration
-	- num_random_configs: int - Number of random configurations to generate
-	
-	Returns a list of dicts: {'name': str, 'command': List[str]}
-	"""
-	configs = []
-	
-	# Memory limits (using a bit less than 3000MB to be safe)
-	mem_limit = 2900
-	mem_params = [f"sat.max_memory={mem_limit}"]
-	sls_mem_param = f"sls.max_memory={mem_limit}"  # Corrected parameter name
-	
-	# 1) Pure modes (always included)
-	configs.append({
-		"name": f"CDCL_{threads}",
-		"command": ["z3", f"sat.threads={threads}", mem_params[0], "-smt2"]
-	})
-	configs.append({
-		"name": f"LS_{threads}",
-		"command": ["z3", "sat.threads=0", f"sat.local_search_threads={threads}", mem_params[0], "-smt2"]
-	})
-	configs.append({
-		"name": f"DDFW_{threads}",
-		"command": ["z3", "sat.threads=0", f"sat.ddfw.threads={threads}", mem_params[0], "-smt2"]
-	})
-	configs.append({
-		"name": f"SLS_{threads}",
-		"command": ["z3", "smt.sls.enable=true", mem_params[0], sls_mem_param, "-smt2"]
-	})
-	configs.append({
-		"name": "PCC_def",
-		"command": ["z3", "parallel.enable=true", f"parallel.threads.max={threads}", mem_params[0], "-smt2"]
-	})
-	
-	# Parameter ranges for random search
-	param_ranges = {
-		"batch_sizes": [50, 100, 200, 500, 1000, 2000],
-		"delays": [0, 5, 10, 20, 50, 100, 500],
-		"restarts": [1, 2, 5, 10, 25, 50],
-	}
-	
-	# Generate random configurations
-	for _ in range(num_random_configs):
-		# Randomly choose configuration type
-		config_type = random.choice([
-			"hybrid_pair",        # Two techniques combined
-			"hybrid_triple",      # Three techniques combined
-			"pcc_with_params",    # PCC with random params
-			"pcc_hybrid"          # PCC combined with another technique
-		])
-		
-		if config_type == "hybrid_pair":
-			# Randomly select two techniques and distribute threads between them
-			techniques = random.sample(["CDCL", "LS", "DDFW", "SLS"], 2)
-			split = random.randint(1, threads-1)
-			remaining = threads - split
-			
-			cmd = ["z3"]
-			name_parts = []
-			has_sls = False
-			
-			for i, technique in enumerate(techniques):
-				t_threads = split if i == 0 else remaining
-				
-				if technique == "CDCL":
-					cmd.append(f"sat.threads={t_threads}")
-					name_parts.append(f"CDCL{t_threads}")
-				elif technique == "LS":
-					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
-						cmd.append("sat.threads=0")
-					cmd.append(f"sat.local_search_threads={t_threads}")
-					name_parts.append(f"LS{t_threads}")
-				elif technique == "DDFW":
-					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
-						cmd.append("sat.threads=0")
-					cmd.append(f"sat.ddfw.threads={t_threads}")
-					name_parts.append(f"DDFW{t_threads}")
-				elif technique == "SLS":
-					cmd.append("smt.sls.enable=true")
-					name_parts.append(f"SLS{t_threads}")
-					has_sls = True
-			
-			# Add memory limits
-			cmd.append(mem_params[0])
-			if has_sls:
-				cmd.append(sls_mem_param)
-			cmd.append("-smt2")
-			configs.append({
-				"name": "_".join(name_parts),
-				"command": cmd
-			})
-			
-		elif config_type == "hybrid_triple":
-			# Randomly distribute threads among three techniques
-			techniques = random.sample(["CDCL", "LS", "DDFW", "SLS"], 3)
-			
-			# Distribute threads among techniques
-			t1_threads = random.randint(1, threads-2)
-			t2_threads = random.randint(1, threads-t1_threads-1)
-			t3_threads = threads - t1_threads - t2_threads
-			
-			thread_counts = [t1_threads, t2_threads, t3_threads]
-			random.shuffle(thread_counts)  # Randomly assign thread counts to techniques
-			
-			cmd = ["z3"]
-			name_parts = []
-			has_sls = False
-			
-			for i, technique in enumerate(techniques):
-				t_threads = thread_counts[i]
-				
-				if technique == "CDCL":
-					cmd.append(f"sat.threads={t_threads}")
-					name_parts.append(f"CDCL{t_threads}")
-				elif technique == "LS":
-					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
-						cmd.append("sat.threads=0")
-					cmd.append(f"sat.local_search_threads={t_threads}")
-					name_parts.append(f"LS{t_threads}")
-				elif technique == "DDFW":
-					if "sat.threads=0" not in cmd and "sat.threads=" not in "".join(cmd):
-						cmd.append("sat.threads=0")
-					cmd.append(f"sat.ddfw.threads={t_threads}")
-					name_parts.append(f"DDFW{t_threads}")
-				elif technique == "SLS":
-					cmd.append("smt.sls.enable=true")
-					name_parts.append(f"SLS{t_threads}")
-					has_sls = True
-			
-			# Add memory limits
-			cmd.append(mem_params[0])
-			if has_sls:
-				cmd.append(sls_mem_param)
-			cmd.append("-smt2")
-			configs.append({
-				"name": "_".join(name_parts),
-				"command": cmd
-			})
-			
-		elif config_type == "pcc_with_params":
-			# PCC with random parameter settings
-			bs = random.choice(param_ranges["batch_sizes"])
-			d = random.choice(param_ranges["delays"])
-			r = random.choice(param_ranges["restarts"])
-			
-			cmd = [
-				"z3",
-				"parallel.enable=true",
-				f"parallel.threads.max={threads}",
-				f"parallel.conquer.batch_size={bs}",
-				f"parallel.conquer.delay={d}",
-				f"parallel.conquer.restart.max={r}",
-				mem_params[0],
-				"-smt2"
-			]
-			
-			configs.append({
-				"name": f"PCC_bs{bs}_d{d}_r{r}",
-				"command": cmd
-			})
-			
-		elif config_type == "pcc_hybrid":
-			# PCC combined with another technique
-			pcc_threads = random.randint(1, threads-1)
-			other_threads = threads - pcc_threads
-			
-			technique = random.choice(["CDCL", "LS", "DDFW", "SLS"])
-			
-			bs = random.choice(param_ranges["batch_sizes"])
-			d = random.choice(param_ranges["delays"])
-			r = random.choice(param_ranges["restarts"])
-			
-			cmd = [
-				"z3",
-				"parallel.enable=true",
-				f"parallel.threads.max={pcc_threads}",
-				f"parallel.conquer.batch_size={bs}",
-				f"parallel.conquer.delay={d}",
-				f"parallel.conquer.restart.max={r}",
-			]
-			
-			name = f"PCC{pcc_threads}_bs{bs}_d{d}_r{r}"
-			has_sls = False
-			
-			if technique == "CDCL":
-				cmd.append(f"sat.threads={other_threads}")
-				name += f"_CDCL{other_threads}"
-			elif technique == "LS":
-				cmd.append("sat.threads=0")
-				cmd.append(f"sat.local_search_threads={other_threads}")
-				name += f"_LS{other_threads}"
-			elif technique == "DDFW":
-				cmd.append("sat.threads=0")
-				cmd.append(f"sat.ddfw.threads={other_threads}")
-				name += f"_DDFW{other_threads}"
-			elif technique == "SLS":
-				cmd.append("smt.sls.enable=true")
-				name += f"_SLS{other_threads}"
-				has_sls = True
-			
-			# Add memory limits
-			cmd.append(mem_params[0])
-			if has_sls:
-				cmd.append(sls_mem_param)
-			cmd.append("-smt2")
-			configs.append({
-				"name": name,
-				"command": cmd
-			})
-	
-	return configs
-
-
-def get_z3_parallel_configs3(threads: int = 8, num_random_configs: int = 30) -> List[Dict]:
 	"""
 	Generate a list of Z3 parallel configurations with random search.
 	
@@ -452,24 +234,15 @@ benches = {
 		"glob": "VLSAT3/**/vlsat3_a*.smt2",
 		"time_limit": "00:40:00",
 		"memory_limit": "3000MB",
-		"threads": 31,
+		"threads": 64,
 		"commands": four_horsemen,
-	},
-	"vlsat3_a_rest": {
-		"version": 1,
-		"glob": "COWABUNGA",
-		"time_limit": "00:40:00",
-		"memory_limit": "3000MB",
-		"threads": 63,
-		"commands": four_horsemen,
-		"task_list": "VLSAT3a_tasks_rest.txt",
 	},
 	"vlsat3_g": {
 		"version": 1,
 		"glob": "VLSAT3/**/vlsat3_g*.smt2",
 		"time_limit": "00:40:00",
 		"memory_limit": "3000MB",
-		"threads": 31,
+		"threads": 64,
 		"commands": four_horsemen,
 	},
 	"smt-comp_2024": {
@@ -479,7 +252,7 @@ benches = {
 		"memory_limit": "3000MB",
 		"threads": 64,
 		"commands": four_horsemen,
-		"task_list": "SMT-COMP_2024_tasks_all.txt",
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt",
 	},
 	"smt-comp_2024-electric-boogaloo": {
 		"version": 1,
@@ -498,16 +271,6 @@ benches = {
 		"threads": 16,
 		"commands": four_horsemen,
 	},
-	# "parallel-scaling-1": {
-	# 	"version": 1,
-	# 	"glob": "COWABUNGA",
-	# 	"time_limit": "00:20:00",
-	# 	"memory_limit": "3000MB",
-	# 	"threads": 64,
-	# 	"parallel": 1,
-	# 	"commands": make_best_parallel(1),
-	# 	"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
-	# },
 	"parallel-scaling-2": {
 		"version": 1,
 		"glob": "COWABUNGA",
@@ -516,7 +279,7 @@ benches = {
 		"threads": 32,
 		"parallel": 2,
 		"commands": make_best_parallel(2),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-scaling-4": {
 		"version": 1,
@@ -526,7 +289,7 @@ benches = {
 		"threads": 16,
 		"parallel": 4,
 		"commands": make_best_parallel(4),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-scaling-8": {
 		"version": 1,
@@ -536,7 +299,7 @@ benches = {
 		"threads": 8,
 		"parallel": 8,
 		"commands": make_best_parallel(8),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-scaling-16": {
 		"version": 1,
@@ -546,7 +309,7 @@ benches = {
 		"threads": 4,
 		"parallel": 16,
 		"commands": make_best_parallel(16),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-scaling-32": {
 		"version": 1,
@@ -556,7 +319,7 @@ benches = {
 		"threads": 2,
 		"parallel": 32,
 		"commands": make_best_parallel(32),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-scaling-64": {
 		"version": 1,
@@ -566,37 +329,17 @@ benches = {
 		"threads": 1,
 		"parallel": 64,
 		"commands": make_best_parallel(64),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-hyperparameter-search": {
 		"version": 1,
 		"glob": "COWABUNGA",
-		"time_limit": "00:04:00",
+		"time_limit": "03:55:00",
 		"memory_limit": "3000MB",
 		"threads": 8,
 		"parallel": 8,
-		"commands": get_z3_parallel_configs3(threads=8, num_random_configs=500),
-		"task_list": "SMT-COMP_2024_tasks_all.txt", # z3 alpha doesn't timeout on these
-	},
-	"parallel-hyperparameter-search-2": {
-		"version": 1,
-		"glob": "COWABUNGA",
-		"time_limit": "00:00:30",
-		"memory_limit": "3000MB",
-		"threads": 1,
-		"parallel": 8,
 		"commands": get_z3_parallel_configs(threads=8, num_random_configs=500),
-		"task_list": "SMT-COMP_2024_tasks_one.txt",
-	},
-	"parallel-hyperparameter-search-3": {
-		"version": 1,
-		"glob": "COWABUNGA",
-		"time_limit": "00:03:00",
-		"memory_limit": "3000MB",
-		"threads": 1,
-		"parallel": 8,
-		"commands": get_z3_parallel_configs3(threads=8, num_random_configs=500),
-		"task_list": "SMT-COMP_2024_tasks_one.txt",
+		"task_list": "SMT-COMP_2024_tasks_all_solved_by_z3alpha.txt", # z3 alpha doesn't timeout on these
 	},
 	"parallel-hyperparameter-search-vlsat": {
 		"version": 1,

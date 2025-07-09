@@ -16,7 +16,7 @@ import copy
 import pickle
 
 RESULTS_FOLDER = Path("results/")
-DATASETS_FOLDER = Path("D:/datasets/")
+DATASETS_FOLDER = Path("datasets/")
 INPUT = "20250618_214918_parallel-hyperparameter-search"
 #INPUT = "20250612_144947_vlsat3_g"
 #INPUT = "20250612_140513_smart_contracts"
@@ -1760,11 +1760,6 @@ def main():
     # OPT = "VLSAT3a"
     # OPT = "smart-contracts"
     #OPT = "parallel-scaling"
-
-    if OPT == "SMT-COMP" or OPT == "parallel-scaling":
-        DATASETS_FOLDER = 'D:/datasets/'
-    else:
-        DATASETS_FOLDER = 'datasets/'
 
     input_names = None
     input1 = None

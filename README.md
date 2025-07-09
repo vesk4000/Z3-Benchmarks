@@ -1,221 +1,137 @@
-# Z3 Benchmarking on SLURM
+# Benchmarking Bit-vector Arithmetic in Z3
 
-A comprehensive benchmarking framework for evaluating Z3 solver configurations on SMT-LIB benchmarks using SLURM clusters.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15848281.svg)](https://doi.org/10.5281/zenodo.15848281)
 
-## Quick Setup
+This is the repository associated with my Bachelors Thesis in Computer Science and Engineering for Delft University of Technology: [Understanding Bit-vector Arithmetic in Z3](https://resolver.tudelft.nl/uuid:79fcf0ae-37e6-4a1c-8f09-1d83afa826be).
 
-1. **Clone and setup environment**:
-   ```bash
-   git clone <your-repo>
-   cd Benchmarking
-   chmod +x init.sh *.sh
-   ./init.sh  # Sets up conda environment and dependencies
-   ```
+[![Poster](poster-500dpi.png)](https://cse3000-research-project.github.io/static/217c9788b195d00bea69b0f00486fc9a/poster.pdf)
 
-2. **Download benchmark datasets**:
-   ```bash
-   mkdir -p datasets
+> Satisfiability modulo theories solvers serve as the backbone of software verifiers, static analyzers, and proof assistants; the versatile bit-vector arithmetic theory is particularly important for these applications. As solvers continue to be developed, they become more capable but also more difficult to configure optimally. The widely-used Z3 prover offers a multitude of configurable techniques for solving bit-vector problems, however, the pace of development has not allowed for a comprehensive comparative analysis of them. We study the available bit-vector algorithms and parallelization methods, on established sets of problems. Through an experimental evaluation, we find that properly configuring Z3 for a specific use case can have significant effects on performance. We offer guidance to developers on how to go about that, which should help to make formal verification tools more efficient.
+
+This complimentary repository contains benchmarking code tailored to [SLURM](https://slurm.schedmd.com/)-based High-Performance Computing (HPC) systems. It also contains data analysis and visualization code. Paired with the [associated Zenodo record](https://zenodo.org/records/15848281), datasets, and [Docker image](https://hub.docker.com/repository/docker/vesk4000/z3-benchmarks); this should contain everything needed to reproduce and validate the experiments in the paper. This repository may also be help if you are trying to benchmark Z3 (or other software) for your own experiments on a SLURM supercomputer.
+
+Do note that this repository has not been extensively documented or tested. It is not a standalone piece of software; more information about all the experiments and the theoretical background can be found in the associated paper. Its main purpose was to serve as one-off code that I was using while working on my thesis. Some of the code and file paths may need to be tuned to work for your particular use case or SLURM setup. Some basic familiarity with SLURM-based HPC is assumed.
+
+## Setup
+1. Clone the repository in the scratch folder of your HPC machine.
+2. Download the datasets, unzip them, and put them in the `datasets` folder of the repository (you can also put different datasets in different places, but you will have to modify some file paths in the code). Your system should have the necessary commands, or if not, they should be in some SLURM module:
+   - SMT-LIB 2024 QF_BV
+      ```shell
+      mkdir -p datasets
+      cd datasets
+      wget -O QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1"
+      tar -I zstd -xf QF_BV.tar.zst
+      rm QF_BV.tar.zst
+      ```
+   - VLSAT-3
+      ```shell
+      cd datasets
+      mkdir -p VLSAT3
+      wget -r --no-parent -A "vlsat3_a*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P VLSAT3
+      wget -r --no-parent -A "vlsat3_g*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P VLSAT3
+      find VLSAT3 -name "*.smt2.bz2" -exec bunzip2 {} +
+      cd ..
+      ```
+   - Smart Contract Verification
+      ```shell
+      cd datasets
+      mkdir -p Smart_Contract_Verification
+      wget -O Smart_Contract_Verification/artifact.tar.gz "https://zenodo.org/records/5652826/files/artifact.tar.gz?download=1"
+      tar -xzf Smart_Contract_Verification/artifact.tar.gz -C Smart_Contract_Verification
+      tar -xzf Smart_Contract_Verification/artifact/benchmarks/full/qfbv.tar.gz -C Smart_Contract_Verification/
+      rm Smart_Contract_Verification/artifact.tar.gz
+      rm -rf Smart_Contract_Verification/artifact
+      cd ..
+      ```
+3. Make a conda environment for the project:
+   ```shell
+   module load miniconda3 # Load the conda module (this may vary depending on your SLURM cluster) every time you use conda
    
-   # QF_BV dataset from Zenodo
-   cd datasets
-   wget -O QF_BV.tar.zst "https://zenodo.org/records/11061097/files/QF_BV.tar.zst?download=1"
-   tar -I zstd -xf QF_BV.tar.zst
-   rm QF_BV.tar.zst
+   conda create -n z3-benchmarking-env python=3.10.18 -y
+   conda activate z3-benchmarking-env # Active any time you want to run the benchmarks
    
-   # VLSAT3 dataset from CADP
-   mkdir -p VLSAT3
-   wget -r --no-parent -A "vlsat3*.smt2.bz2" https://cadp.inria.fr/ftp/benchmarks/vlsat/ -P VLSAT3
-   find VLSAT3 -name "*.smt2.bz2" -exec bunzip2 {} +
+   conda install -c conda-forge numpy=1.26.4 pandas=1.5.3 matplotlib-base=3.10.0 scipy=1.15.3 scikit-learn=1.6.1 -y
+   conda install -c conda-forge orange3=3.32.0 -y
+   pip install ijson==3.4.0 z3-solver==4.15.1.0 pysmt==0.9.6
+   ```
+4. Setup the two Z3 versions via a Docker container on the SLURM machine using the provided Docker image:
+   ```shell
+   module load apptainer
    
-   # SMT-COMP 2024 dataset (adjust URL/path as needed)
-   # Download from SMT-COMP official sources or your institution's mirror
+   # Pull the Docker image and convert to Apptainer SIF format
+   apptainer pull z3-benchmarks.sif docker://vesk4000/z3-benchmarks:v3
+   CONTAINER=$(realpath z3-benchmarks.sif)
+   echo "export CONTAINER=$CONTAINER" >> ~/.bashrc
+      
+   # Create z3 wrapper script
+   mkdir -p ~/bin
+   cat > ~/bin/z3 << 'EOF'
+   #!/usr/bin/env bash
+   if [[ "${1:-}" == "--poly" ]]; then
+      shift
+      exec apptainer exec $CONTAINER z3-poly "$@"
+   else
+      exec apptainer exec $CONTAINER z3 "$@"
+   fi
+   EOF
+   chmod +x ~/bin/z3
+   export PATH="$HOME/bin:$PATH"
+   echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+   
+   # Test the setup
+   z3 --version          # Should see "Z3 version 4.15.1 - 64 bit"
+   z3 --poly --version   # Should see "Z3 version 4.13.1 - 64 bit"
    ```
-
-3. **Update SLURM configuration** in scripts (partition, account, paths):
-   ```bash
-   # Edit slurm-*.sh files to match your cluster settings:
-   # - #SBATCH --partition=your-partition
-   # - #SBATCH --account=your-account  
-   # - cd /your/scratch/path/Benchmarking
-   ```
-
-4. **Update dataset paths** in `plot_results.py`:
-   ```python
-   # Edit the DATASETS_FOLDER variable to match your setup:
-   DATASETS_FOLDER = Path("/path/to/your/datasets/")
-   ```
-
-## Dataset Requirements
-
-The framework expects datasets in these locations:
-- `datasets/QF_BV/` - SMT-LIB QF_BV benchmarks
-- `datasets/VLSAT3/` - VLSAT3 benchmarks  
-- `datasets/SMT-COMP_2024/` - SMT-COMP 2024 benchmarks
-- `datasets/Smart_Contract_Verification/` - Smart contract benchmarks
-
-**Required tools for dataset extraction:**
-- `zstd` - for QF_BV.tar.zst extraction
-- `bzip2` - for VLSAT3 .bz2 files
-- `wget` - for downloading datasets
-
-Install on Ubuntu/Debian:
-```bash
-sudo apt-get install zstd bzip2 wget
-```
-
-## Available Benchmarks
-
-The framework includes pre-configured benchmark suites:
-
-| Name | Dataset | Configs | Time Limit | Description |
-|------|---------|---------|------------|-------------|
-| `smt-comp_2024` | SMT-COMP 2024 | 4 solver configs | 20 min | Main competition benchmark |
-| `vlsat3_a` | VLSAT3 | 4 solver configs | 40 min | VLSAT3 'a' instances |
-| `vlsat3_g` | VLSAT3 | 4 solver configs | 40 min | VLSAT3 'g' instances |
-| `smart_contracts` | Smart contracts | 4 solver configs | 60 min | Smart contract verification |
-| `parallel-hyperparameter-search` | SMT-COMP 2024 | 500 random configs | 4 min | Hyperparameter optimization |
-| `parallel-scaling-X` | SMT-COMP 2024 | 1 config | 20 min | Scaling analysis (X = 2,4,8,16,32,64 cores) |
 
 ## Running Benchmarks
 
-### Standard Benchmarks
-```bash
-# Submit specific benchmark jobs
-sbatch slurm-smt-comp_2024.sh
-sbatch slurm-vlsat3_a.sh
-sbatch slurm-vlsat3_g.sh
-sbatch slurm-smart_contracts.sh
-```
-
-### Hyperparameter Search
-```bash
-sbatch slurm-parallel-hyperparameter-search.sh
-```
-
-### Scaling Analysis
-```bash
-# Run parallel scaling experiments
-sbatch slurm-parallel-scaling-2.sh
-sbatch slurm-parallel-scaling-4.sh
-sbatch slurm-parallel-scaling-8.sh
-sbatch slurm-parallel-scaling-16.sh
-sbatch slurm-parallel-scaling-32.sh
-sbatch slurm-parallel-scaling-64.sh
-```
-
-### Monitor Jobs
-```bash
-squeue -u $USER                    # Check job status
-scancel <job-id>                   # Cancel specific job
-tail -f logs/<job-name>-<id>.out   # Follow job output
-```
-
-## Solver Configurations
-
-The framework tests these Z3 configurations:
-
-- **z3-bit-blast**: Bit-blasting with SMT tactic
-- **z3-int-blast**: Integer solver with BV solver=2  
-- **z3-lazy-bit-blast**: Polynomial arithmetic with BV solver=1
-- **z3-sls-and-bit-blasting-sequential**: Stochastic local search (sequential)
-
-For parallel experiments, additional configurations test various thread combinations and parameter settings.
+1. Update SLURM parameters in the `sbatch-scripts` (partition, account, path, etc.) to match your cluster configuration:
+   - `#SBATCH --partition=desired-partition`
+   - `#SBATCH --account=your-account` 
+   - `cd /scratch/username/repository-path`
+2. Run the SLURM scripts in `sbatch-scripts/`:
+   ```shell
+   mkdir -p logs # If we don't create the logs folder, the SLURM scipts will fail only after they have waited in the queue
+   for script in sbatch-scripts/*.sh; do
+      sbatch "$script"
+   done
+   ```
+   You can ignore the warning `sbatch: This job submission specifies multiple tasks, but it doesn't use 'srun' to run multiple tasks.` We run `srun` in the `benchy.py` script rather than directly in the SLURM scripts, so this is expected.
 
 ## Analysis & Visualization
 
-1. **Process results** (automatically finds latest results):
-   ```bash
-   python plot_results.py  # Edit INPUT variable for specific dataset
-   ```
+### Download existing results
+In case you do not wish to run the benchmarks yourself, you can get the results from my experiments from [the associated Zenodo record](https://zenodo.org/records/15848281):
 
-2. **Sort hyperparameter results**:
-   ```bash
-   python sort_hyperparameter_results.py results/TIMESTAMP_*/parallel_hyperparameter_search_ranks.txt
-   ```
+```shell
+mkdir -p results
+cd results
+wget -O results.tar "https://zenodo.org/records/15848281/files/results.tar?download=1"
+tar -xf results.tar
+rm results.tar
+cd ..
+```
 
-3. **Generated plots**:
+### Visualize results
+
+In the `main` function of `plot_results.py` you can change the `OPT` variable to select which set of results to visualize:
+- `SMT-COMP`
+- `VLSAT3g`
+- `VLSAT3a`
+- `smart-contracts`
+- `parallel-scaling`
+
+If you are using your own results, some tweaking would be required, since you need to specify the exact location of each set of results.
+
+Once you have configured the desired set of results to analyze, you can run:
+```shell
+python plot_results.py
+```
+
+A number of different plots will be generated:
    - `quantile.svg`: Cactus plot showing solver performance
    - `scatter_*.svg`: Pairwise solver comparisons  
    - `critical_difference.svg`: Statistical significance analysis
-   - `histogram_family_binned_performance.svg`: Performance by benchmark family
+   - `histogram_family_binned_performance.svg`: Performance by benchmark family (only applicable for the SMT-COMP 2024 dataset)
 
-4. **Critical difference analysis**:
-   ```bash
-   python sort_hyperparameter_results.py ranks.txt --cd-only --instances 30
-   ```
-
-## Key Files
-
-| File | Purpose |
-|------|---------|
-| `benchy.py` | Main benchmarking script with solver configurations |
-| `slurm-*.sh` | SLURM job scripts for different experiments |
-| `plot_results.py` | Visualization and statistical analysis |
-| `sort_hyperparameter_results.py` | Results processing and ranking |
-| `init.sh` | Environment setup script |
-| `*_tasks*.txt` | Task lists for different benchmark subsets |
-
-## Configuration
-
-### Solver Configs (in benchy.py)
-```python
-four_horsemen = [
-    {
-        "name": "z3-bit-blast", 
-        "command": ["z3", "-smt2", "tactic.default_tactic='...'"]
-    },
-    # Add custom configurations here
-]
-```
-
-### SLURM Resources (in slurm-*.sh)
-```bash
-#SBATCH --time=02:00:00      # Adjust time limit
-#SBATCH --mem-per-cpu=3200MB # Adjust memory
-#SBATCH --ntasks=64          # Adjust parallelism
-```
-
-### Dataset Paths (in plot_results.py)
-```python
-DATASETS_FOLDER = Path("D:/datasets/")  # Update to your path
-INPUT = "20250618_214918_parallel-hyperparameter-search"  # Select dataset
-```
-
-## Output Structure
-
-```
-results/
-  TIMESTAMP_experiment-name/
-    dataset/family/instance.smt2_config.{out,err}
-    logs/
-cache/
-  cleaned_data_*.pkl        # Processed results cache
-  smt2_stats_cache.json     # SMT2 file analysis cache
-logs/
-  job-name-id.{out,err}     # SLURM job logs
-```
-
-## Advanced Usage
-
-### Custom Task Lists
-Create text files with instance paths:
-```bash
-echo "SMT-COMP_2024/QF_BV/family/instance.smt2" > custom_tasks.txt
-python benchy.py --name custom --task-list custom_tasks.txt
-```
-
-### Merging Multiple Runs
-The framework automatically merges results from multiple runs of the same experiment, taking the best result for each instance.
-
-### Memory and Time Limits
-Each benchmark configuration specifies appropriate limits. Smart contracts use higher memory (12GB) and longer timeouts (60min).
-
-## Troubleshooting
-
-- **Permission denied**: Run `chmod +x *.sh` to make scripts executable
-- **Module not found**: Check conda environment activation in SLURM scripts
-- **Out of memory**: Reduce `--mem-per-cpu` or increase memory limits in job scripts
-- **Jobs pending**: Check cluster queue status and resource availability
-- **No results**: Verify dataset paths and task file contents
-
-
+There are a few other scripts in the repository used to prepare the task files for the benchmarks, and to analyze the results of the hyperparameter search. The `extract_qfbv_stats.py` script requires the JSON-formatted results of the SMT-COMP 2024 non-incremental QF_BV track. It's a big file, so it wasn't included in the repository.
